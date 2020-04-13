@@ -183,7 +183,7 @@ class PolicyNetwork():
 
 	# TRAINABLE
 	def attention(self, r_star, q_t):
-		# TODO
+		# TODO: tf.nn.softmax
 		# a_star = self.softmax(b_m_star)
 		# q_t_star[t] = np.dot(np.array(a_star).T, q_t[t])	#  q_t[t] give w_i_ts
 		pass

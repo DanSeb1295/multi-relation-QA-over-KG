@@ -6,7 +6,7 @@ class SLP():
 		self.weights_dict = {}
 		self.biases_dict = {}
 
-		for t in T:
+		for t in range(T):
 			self.weights_dict[t] = tf.Variable(tf.truncated_normal([d, d], stddev=1.0/math.sqrt(float(d))), name='weights_{}'.format(t))
 			self.biases_dict[t] = tf.Variable(tf.zeros([d]), name='biases_{}'.format(d))
 	
