@@ -5,8 +5,8 @@ initializer = tf.contrib.layers.xavier_initializer()
 
 class Perceptron():
 	def __init__(self):
-		self.W_L1 = tf.Variable(initializer([d, 2*d]), name='weights_L1')
-		self.W_L2 = tf.Variable(initializer([d]), name='weights_L2')
+		self.W_L1 = tf.Variable(initializer([d, 2*d]))
+		self.W_L2 = tf.Variable(initializer([d]))
 
 	def compute(self, r_star, H_t, q_t_star):
 		if r_star.shape == (d, 1):

@@ -5,8 +5,8 @@ initializer = tf.contrib.layers.xavier_initializer()
 
 class Attention():
 	def __init__(self):
-		self.W = tf.Variable(initializer([d]), name='weights_W')
-		self.B = tf.Variable(initializer(0), name='biases_B')
+		self.W = tf.Variable(initializer([d]))
+		self.B = tf.Variable(initializer(0))
 
 	def compute(self, r_star, q_t):
 		if r_star.shape == (d, 1):
