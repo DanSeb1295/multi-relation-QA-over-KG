@@ -1,5 +1,5 @@
 from Environment import d, State, Environment
-from components import BiGRU, GRU, Perceptron, SLP, Embedder
+from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
 from util import train_test_split, save_checkpoint
 import numpy as np
 import tensorflow as tf
@@ -35,11 +35,8 @@ class PolicyNetwork():
 			self.initialise_models()
 
 	def initialise_models(self):
-		'''
-		TODO:
-			# self.embedder = Embedder
-			# self.GRU = GRU
-		'''
+		# TODO: self.embedder = Embedder
+		self.GRU = GRU()
 		self.Perceptron = Perceptron
 		self.Attention = Attention()
 		self.BiGRU = BiGRU()
@@ -122,7 +119,7 @@ class PolicyNetwork():
 			
 			for t in range(1, T+1):
 				q_t[t] = self.slp(q_vector, t)				# Single-Layer Perceptron Module
-				H_t[t] = self.gru(H_t[t-1], r_t[t-1])		# History Encoder Module
+				H_t[t] = self.gru(r_t[t-1])		# History Encoder Module
 				possible_actions = env.get_possible_actions()
 				action_space = self.beam_search(possible_actions)
 
@@ -177,10 +174,9 @@ class PolicyNetwork():
 		return self.SLP.compute(q_vector, t)
 
 	# TRAINABLE
-	def gru(self, H_t, r_t):
-		# num_layers = 3, hidden_dim = 300, dropout = 0.3, Xavier Initialisation
-		# TODO: return H_t_plus_1
-		pass
+	def gru(self, r_t):
+		# Returns: H_t_plus_1 = GRU(H_t, r_t)
+		return self.GRU.compute(r_t)		
 
 	# TRAINABLE
 	def attention(self, r_star, q_t):
