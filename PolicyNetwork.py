@@ -94,7 +94,7 @@ class PolicyNetwork():
 	def run_train_op(self, train_set):
 		# Hyperparameters configuration
 		self.beam_size = 1
-		for inputs in train_set:
+		for inputs in tqdm(train_set):
 			predictions, outputs = self.forward(inputs)
 			loss = self.REINFORCE_loss_function(outputs)
 			self.opt.minimize(loss)
@@ -107,7 +107,7 @@ class PolicyNetwork():
 	        n = len(val_set)
 	        y_hat = []
 
-	        for inputs in val_set:
+	        for inputs in tqdm(val_set):
 	            predictions, outputs = self.forward(inputs)
 	            y_hat.append(y_pred)
 	        if predictions:
