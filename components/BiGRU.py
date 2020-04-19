@@ -1,7 +1,8 @@
 import tensorflow as tf
 from tf import keras
+from Environment import d
 
-HIDDEN_DIM = 150
+HIDDEN_DIM = d / 2
 
 class BiGRU():
 	def __init__(self):

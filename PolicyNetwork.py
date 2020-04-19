@@ -26,6 +26,7 @@ class PolicyNetwork():
 				# self.Embedder = Embedder
 				# self.BiGRU = BiGRU 
 				# self.SLP = SLP
+				# self.Attention = Attention
 				# self.GRU = GRU
 				# self.Perceptron = Perceptron
 			'''
@@ -38,8 +39,9 @@ class PolicyNetwork():
 		TODO:
 			# self.embedder = Embedder
 			# self.GRU = GRU
-			# self.Perceptron = Perceptron
 		'''
+		self.Perceptron = Perceptron
+		self.Attention = Attention()
 		self.BiGRU = BiGRU()
 		self.SLP = SLP(self.T)
 
@@ -119,8 +121,8 @@ class PolicyNetwork():
 			self.env.start_new_query(S_t[1], ans)
 			
 			for t in range(1, T+1):
-				q_t[t] = self.slp(q_vector)				# Single-Layer Perceptron Module
-				H_t[t] = self.gru(H_t[t-1], r_t[t-1])	# History Encoder Module
+				q_t[t] = self.slp(q_vector, t)				# Single-Layer Perceptron Module
+				H_t[t] = self.gru(H_t[t-1], r_t[t-1])		# History Encoder Module
 				possible_actions = env.get_possible_actions()
 				action_space = self.beam_search(possible_actions)
 
@@ -166,14 +168,13 @@ class PolicyNetwork():
 
 	# TRAINABLE
 	def bigru(self, q):
-		# d = 100, num_layers = 2, hidden_dim = 150
-		# TODO: return q_vector
-		pass
+		# Returns: q_vector
+		return self.BiGRU.compute(q)
 
 	# TRAINABLE
-	def slp(self, q_vector):
-		# TODO: return q_t = Tanh(Wt * q_vector + b_t)
-		pass
+	def slp(self, q_vector, t):
+		# Returns: q_t = Tanh(Wt * q_vector + b_t)
+		return self.SLP.compute(q_vector, t)
 
 	# TRAINABLE
 	def gru(self, H_t, r_t):
@@ -183,15 +184,13 @@ class PolicyNetwork():
 
 	# TRAINABLE
 	def attention(self, r_star, q_t):
-		# TODO: tf.nn.softmax
-		# a_star = self.softmax(b_m_star)
-		# q_t_star[t] = np.dot(np.array(a_star).T, q_t[t])	#  q_t[t] give w_i_ts
-		pass
+		# Returns: q_t_star[t]
+		return self.Attention.compute(r_star, q_t)
 
 	# TRAINABLE
-	def perceptron(self, action, q):
-		# TODO: return S(a_t, q) = r_star * W_L2 * ReLU(W_L1 * [H_t;q_t_star])
-		pass
+	def perceptron(self, r_star, H_t, q_t_star):
+		# Returns: S(a_t, q) = r_star * W_L2 * ReLU(W_L1 * [H_t; q_t_star])
+		return self.Perceptron.compute(r_star, H_t, q_t_star)
 
 	# PRE-TRAINED
 	def embed(self, vector):
