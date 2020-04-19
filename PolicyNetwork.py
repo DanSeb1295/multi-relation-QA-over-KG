@@ -201,13 +201,9 @@ class PolicyNetwork():
 		discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-7)
         return discounted_r
 
-<<<<<<< HEAD
+
 	def REINFORCE_loss_function(self, outputs):
 		actions_onehot, action_probs, rewards = outputs
-=======
-	def REINFORCE_loss_function(self,outputs):
-		actions_onehot, action_probs, reward = outputs
->>>>>>> b6f959fcdbca2ffc287cb4c6a6e5b3e508ca741b
 		action_prob = K.sum(action_probs * actions_onehot, axis=1)
 		log_action_prob = K.log(action_prob)
 		loss = - log_action_prob * rewards
