@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import norm
 
-d = 300
+d = 50
 
 class State():
 	def __init__(self, q, e_s, e_t, h_t: set, t=1, q_t = [np.zeros(d)], H_t = np.zeros(d)):

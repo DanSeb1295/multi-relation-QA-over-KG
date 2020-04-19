@@ -1,14 +1,16 @@
 import tensorflow as tf
 from Environment import d
 
+initializer = tf.contrib.layers.xavier_initializer()
+
 class SLP():
 	def __init__(self, T):
 		self.weights_dict = {}
 		self.biases_dict = {}
 
 		for t in range(T):
-			self.weights_dict[t] = tf.Variable(tf.truncated_normal([d, d], stddev=1.0/math.sqrt(float(d))), name='weights_{}'.format(t))
-			self.biases_dict[t] = tf.Variable(tf.zeros([d]), name='biases_{}'.format(d))
+			self.weights_dict[t] = tf.Variable(initializer([d, d]), name='weights_{}'.format(t))
+			self.biases_dict[t] = tf.Variable(initializer([d]), name='biases_{}'.format(d))
 	
 	def compute(self, q, t):
 		w_t = self.weights_dict[t]

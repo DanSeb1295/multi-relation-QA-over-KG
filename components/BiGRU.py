@@ -1,14 +1,18 @@
 import tensorflow as tf
 from tf import keras
+from Environment import d
 
-HIDDEN_DIM = 150
+HIDDEN_DIM = d / 2
+dropout = 0.3
+initializer='xavier'
 
 class BiGRU():
+	# TODO: DROPOUT
 	def __init__(self):
-		self.fw_1 = keras.layers.GRU(HIDDEN_DIM)
-		self.fw_2 = keras.layers.GRU(HIDDEN_DIM)
-		self.bw_1 = keras.layers.GRU(HIDDEN_DIM, go_backwards=True) 
-		self.bw_2 = keras.layers.GRU(HIDDEN_DIM, go_backwards=True) 
+		self.fw_1 = keras.layers.GRU(HIDDEN_DIM, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
+		self.fw_2 = keras.layers.GRU(HIDDEN_DIM, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
+		self.bw_1 = keras.layers.GRU(HIDDEN_DIM, go_backwards=True, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
+		self.bw_2 = keras.layers.GRU(HIDDEN_DIM, go_backwards=True, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
 
 	def compute(self, q):
 		fw_out_1 = self.fw_1(q)

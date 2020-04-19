@@ -1,5 +1,5 @@
 from Environment import d, State, Environment
-from components import BiGRU, GRU, Perceptron, SLP, Embedder
+from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
 from util import train_test_split, save_checkpoint
 import numpy as np
 import tensorflow as tf
@@ -14,35 +14,39 @@ class PolicyNetwork():
 		self.env = None
 		self.beam_size = 1
 		self.lr = 1e-3
+<<<<<<< HEAD
 		self.ita_discount = 0.8
 		self.opt = tf.train.AdamOptimizer(learning_rate = self.lr)
+=======
+		self.sess = tf.Session()
+>>>>>>> 4deeb4ac57bd3cac901cd9b90534e0c79e3cee3c
 
 		if saved_model_path:
 			self.load_saved_model(saved_model_path)
 		else:
 			self.initialise_models()
 
-	def load_saved_model(self, saved_model_path):
+	def load_saved_model(self, sess, saved_model_path):
 		try:
 			'''
 			TODO: LOAD MODELS
 				# self.Embedder = Embedder
 				# self.BiGRU = BiGRU 
 				# self.SLP = SLP
+				# self.Attention = Attention
 				# self.GRU = GRU
 				# self.Perceptron = Perceptron
 			'''
-			pass
+			saver = tf.train.import_meta_graph(saved_model_path)
+			saver.restore(self.sess, tf.train.latest_checkpoint('./'))
 		except:
 			self.initialise_models()
 
 	def initialise_models(self):
-		'''
-		TODO:
-			# self.embedder = Embedder
-			# self.GRU = GRU
-			# self.Perceptron = Perceptron
-		'''
+		# TODO: self.embedder = Embedder
+		self.GRU = GRU()
+		self.Perceptron = Perceptron
+		self.Attention = Attention()
 		self.BiGRU = BiGRU()
 		self.SLP = SLP(self.T)
 
@@ -102,6 +106,7 @@ class PolicyNetwork():
 		# Hyperparameters configuration
 		self.beam_size = 32
 		T = self.T
+<<<<<<< HEAD
 		n = len(val_set)
 		y_hat = []
 
@@ -112,6 +117,58 @@ class PolicyNetwork():
 			acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
 		return acc, y_hat
 		
+=======
+		knowledge_graph = self.KG
+
+		# TODO: Define TF loss function
+		# TODO: Redo in TF
+		total_reward = 0
+		for q, e_s, ans in train_set:
+			trajectory = []
+			rewards = []
+			q = [self.Embedder.embed_word(w) for w in q]	# Embedding Module
+			n = len(q)
+
+			e_t = {}		# T x 1
+			h_t = {}		# T x set()
+			S_t = {}		# T x States
+			q_t = {}		# T x d x n
+			H_t = {}		# T x d
+			r_t = {}		# T x d
+			a_t = {}		# T x d x 2(relation, node)
+			w_t_m = {}		# T x d
+			q_t_star = {}	# T x d
+
+			e_t[1] = e_s
+			h_t[1] = set()		# OR LIST????
+			S_t[1] = State(q, e_s, e_t[1], h_t[1])
+			q_vector = self.bigru(q)					# BiGRU Module
+			H_t[0] = np.zeros(d)
+			r_t[0] = np.zeros(d)
+			
+			self.env.start_new_query(S_t[1], ans)
+			
+			for t in range(1, T+1):
+				q_t[t] = self.slp(q_vector, t)				# Single-Layer Perceptron Module
+				H_t[t] = self.gru(r_t[t-1])		# History Encoder Module
+				possible_actions = env.get_possible_actions()
+				action_space = self.beam_search(possible_actions)
+
+				semantic_scores = []
+				for action in action_space:
+					# Attention Layer: Generate Similarity Scores between q and r and current point of attention
+					r_star = self.Embedder.embed_relation(action[0])
+					q_t_star[t] = self.attention(r_star, q_t[t])
+
+					# Perceptron Module: Generate Semantic Score for action given q
+					score = self.perceptron(r_star, H_t[t], q_t_star[t])
+					semantic_scores.append(score)
+				
+				# Softmax Module: Leading to selection of action according to policy
+				action_distribution = self.generate_action_distribution(action_space, semantic_scores)
+				action = self.sample_action(action_distribution)
+				a_t[t] = action
+>>>>>>> 4deeb4ac57bd3cac901cd9b90534e0c79e3cee3c
 
 
 	def forward(self, inputs):
@@ -197,36 +254,28 @@ class PolicyNetwork():
 
 	# TRAINABLE
 	def bigru(self, q):
-		# d = 100, num_layers = 2, hidden_dim = 150
-		# TODO: return q_vector
-		pass
+		# Returns: q_vector
+		return self.BiGRU.compute(q)
 
 	# TRAINABLE
-	def slp(self, q_vector):
-		# TODO: return q_t = Tanh(Wt * q_vector + b_t)
-		pass
+	def slp(self, q_vector, t):
+		# Returns: q_t = Tanh(Wt * q_vector + b_t)
+		return self.SLP.compute(q_vector, t)
 
 	# TRAINABLE
-	def gru(self, H_t, r_t):
-		# num_layers = 3, hidden_dim = 300, dropout = 0.3, Xavier Initialisation
-		# TODO: return H_t_plus_1
-		pass
+	def gru(self, r_t):
+		# Returns: H_t_plus_1 = GRU(H_t, r_t)
+		return self.GRU.compute(r_t)		
 
 	# TRAINABLE
 	def attention(self, r_star, q_t):
-		# TODO: tf.nn.softmax
-		# a_star = self.softmax(b_m_star)
-		# q_t_star[t] = np.dot(np.array(a_star).T, q_t[t])	#  q_t[t] give w_i_ts
-		pass
+		# Returns: q_t_star[t]
+		return self.Attention.compute(r_star, q_t)
 
 	# TRAINABLE
-	def perceptron(self, action, q):
-		# TODO: return S(a_t, q) = r_star * W_L2 * ReLU(W_L1 * [H_t;q_t_star])
-		pass
-
-	# PRE-TRAINED
-	def embed(self, vector):
-		return self.Embedder.embed(vector)
+	def perceptron(self, r_star, H_t, q_t_star):
+		# Returns: S(a_t, q) = r_star * W_L2 * ReLU(W_L1 * [H_t; q_t_star])
+		return self.Perceptron.compute(r_star, H_t, q_t_star)
 
 	def beam_search(self, possible_actions, beam_size = None):
 		if not beam_size:
