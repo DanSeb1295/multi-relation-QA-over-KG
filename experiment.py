@@ -4,7 +4,6 @@ from util import prep_dataset
 from matplotlib.pyplot import plt
 
 epochs = 10
-checkpoint = 60		# Every _ Minutes
 
 path_KB = ''
 path_QA = ''
