@@ -13,13 +13,14 @@ class PolicyNetwork():
 		self.env = None
 		self.beam_size = 1
 		self.lr = 1e-3
+		self.sess = tf.Session()
 
 		if saved_model_path:
 			self.load_saved_model(saved_model_path)
 		else:
 			self.initialise_models()
 
-	def load_saved_model(self, saved_model_path):
+	def load_saved_model(self, sess, saved_model_path):
 		try:
 			'''
 			TODO: LOAD MODELS
@@ -30,7 +31,8 @@ class PolicyNetwork():
 				# self.GRU = GRU
 				# self.Perceptron = Perceptron
 			'''
-			pass
+			saver = tf.train.import_meta_graph(saved_model_path)
+			saver.restore(self.sess, tf.train.latest_checkpoint('./'))
 		except:
 			self.initialise_models()
 
@@ -87,12 +89,11 @@ class PolicyNetwork():
 		self.beam_size = 1
 		T = self.T
 		knowledge_graph = self.KG
-		q_list, e_s_list, ans_list = train_set
 
 		# TODO: Define TF loss function
 		# TODO: Redo in TF
 		total_reward = 0
-		for q, e_s, ans in zip(q_list, e_s_list, ans_list):
+		for q, e_s, ans in train_set:
 			trajectory = []
 			rewards = []
 			q = self.embed(q)							# Embedding Module
