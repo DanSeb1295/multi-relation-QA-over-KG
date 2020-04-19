@@ -1,12 +1,12 @@
 #HOW-TO: 
-#from Entity_linker import Entity_linker (import class)
-#entity_linker = Entity_linker() (instantiate class)
-#entity_linker(question), where question is the whole question string, would return a tuple(tokenized list of the question with entity replaced, entity)
+#from EntityLinker import EntityLinker (import class)
+#EntityLinker = EntityLinker() (instantiate class)
+#EntityLinker(question), where question is the whole question string, would return a tuple(tokenized list of the question with entity replaced, entity)
 #!!! Remember that you have to escape the 's present in the string (use "..." or '''...''')
 
 import pandas as pd
 
-class Entity_linker:
+class EntityLinker:
     def __init__(self):
         qa_file_path = "data/PQ-2H.txt"
         kb_file_path = "data/2H-kb.txt"
