@@ -1,6 +1,7 @@
 from PolicyNetwork import PolicyNetwork
 from Environment import Environment
 from util import prep_dataset
+from matplotlib.pyplot import plt
 
 epochs = 10
 checkpoint = 60		# Every _ Minutes
@@ -27,3 +28,25 @@ train_acc_per, val_acc_per = policy_network.train(inputs, epochs=epochs, attenti
 train_acc_att, val_acc_att = policy_network.train(inputs, epochs=epochs, perceptron=False)		# Model does not use perceptron layer
 
 # TODO: Plot Results
+import pandas as pd
+import numpy as np
+print(pd.DataFrame({'SRN': [np.mean(val_acc_att_per)], 'w/o Attention': [np.mean(val_acc_per)],
+                    'w/o Perceptron': [np.mean(val_acc_att)]}, index=["PQ-2H"]).T)
+
+# # plot epochs vs acc
+# xaxis = range(len(epochs))
+# ymin = 0
+# ymax = 1
+# fig = plt.figure()
+
+# plt.title("Ablation Study of PQ-2H")
+# plt.xlabel('Epochs')
+# plt.ylabel('Validation Set Hits@1')
+# plt.plot(xaxis, val_acc_att_per, 'r', label='SRN')
+# plt.plot(xaxis, val_acc_per, 'b', label='no Attention layer')
+# plt.plot(xaxis, val_acc_att, 'g', label='no Perceptron layer')
+# axes = plt.gca()
+# axes.set_ylim([ymin, ymax])
+
+# plt.legend()
+# plt.show()
