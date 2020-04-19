@@ -5,6 +5,7 @@ import numpy as np
 import tensorflow as tf
 from tf import keras
 from keras import backend as K
+from keras.preprocessing.sequence import pad_sequences
 from tqdm import tqdm
 
 class PolicyNetwork():
@@ -13,6 +14,8 @@ class PolicyNetwork():
 		self.env = None
 		self.beam_size = 1
 		self.lr = 1e-3
+		self.ita_discount = 0.8
+		self.opt = tf.train.AdamOptimizer(learning_rate = self.lr)
 
 		if saved_model_path:
 			self.load_saved_model(saved_model_path)
@@ -42,6 +45,8 @@ class PolicyNetwork():
 		'''
 		self.BiGRU = BiGRU()
 		self.SLP = SLP(self.T)
+
+
 
 	def train(self, inputs, epochs=10, attention=True, perceptron=True):
 		KG, dataset, T = inputs
@@ -83,86 +88,112 @@ class PolicyNetwork():
 		val_acc, predictions = self.run_val_op(dataset, predictions = True)
 		return val_acc, predictions
 
+
 	def run_train_op(self, train_set):
 		# Hyperparameters configuration
 		self.beam_size = 1
-		T = self.T
-		knowledge_graph = self.KG
-		q_list, e_s_list, ans_list = train_set
-
-		# TODO: Define TF loss function
-		# TODO: Redo in TF
-		total_reward = 0
-		for q, e_s, ans in zip(q_list, e_s_list, ans_list):
-			trajectory = []
-			rewards = []
-			q = self.embed(q)							# Embedding Module
-			n = len(q)
-
-			e_t = {}		# T x 1
-			h_t = {}		# T x set()
-			S_t = {}		# T x States
-			q_t = {}		# T x d x n
-			H_t = {}		# T x d
-			r_t = {}		# T x d
-			a_t = {}		# T x d x 2(relation, node)
-			w_t_m = {}		# T x d
-			q_t_star = {}	# T x d
-
-			e_t[1] = e_s
-			h_t[1] = set()		# OR LIST????
-			S_t[1] = State(q, e_s, e_t[1], h_t[1])
-			q_vector = self.bigru(q)					# BiGRU Module
-			H_t[0] = np.zeros(d)
-			r_t[0] = np.zeros(d)
-			
-			self.env.start_new_query(S_t[1], ans)
-			
-			for t in range(1, T+1):
-				q_t[t] = self.slp(q_vector)				# Single-Layer Perceptron Module
-				H_t[t] = self.gru(H_t[t-1], r_t[t-1])	# History Encoder Module
-				possible_actions = env.get_possible_actions()
-				action_space = self.beam_search(possible_actions)
-
-				semantic_scores = []
-				for action in action_space:
-					# Attention Layer: Generate Similarity Scores between q and r and current point of attention
-					r_star = self.embed(action[0])
-					q_t_star[t] = self.attention(r_star, q_t[t])
-
-					# Perceptron Module: Generate Semantic Score for action given q
-					score = self.perceptron(r_star, H_t[t], q_t_star[t])
-					semantic_scores.append(score)
-				
-				# Softmax Module: Leading to selection of action according to policy
-				action_distribution = self.generate_action_distribution(action_space, semantic_scores)
-				action = self.sample_action(action_distribution)
-				a_t[t] = action
-
-				# Take action, advance state, and get reward
-				# q_t & H_t passed in order to generate the new State object within Environment
-				new_state, new_reward = env.transit(action, t, q_t, H_t)
-				S_t[t+1] = new_state
-
-				# Record action, state and reward
-				trajectory += [S_t[t], a_t[t]]
-				rewards.append(new_reward)
-
-			total_reward += sum(rewards)
-
-		return total_reward
+		for inputs in train_set:
+			predictions, outputs = forward(inputs)
+			loss = REINFORCE_loss_function(outputs)
+			self.opt.minimize(loss)
 
 
 	def run_val_op(self, val_set, predictions = False):
 		# Hyperparameters configuration
 		self.beam_size = 32
 		T = self.T
-		knowledge_graph = self.KG
-		q, e_s, ans = val_set
+		n = len(val_set)
+		y_hat = []
 
-		# TODO: Implement val_op
-			# if predictions: return val_acc, predictions
-		pass
+		for inputs in val_set:
+			predictions, outputs = pred_forward(inputs)
+			y_hat.append(y_pred)
+		if predictions:
+			acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
+		return acc, y_hat
+		
+
+
+	def forward(self, inputs):
+		q, e_s, ans = inputs
+		T = self.T
+
+		#OUTPUTS
+		rewards = []
+		action_probs = []
+		actions_onehot = []
+		
+		q = self.embed(q)
+		q = tf.convert_to_tensor(q)							# Embedding Module
+		n = len(q)
+
+		e_t = {}		# T x 1; entity
+		h_t = {}		# T x set(); history
+		S_t = {}		# T x States; state
+		q_t = {}		# T x d x n; question
+		H_t = {}		# T x d; encoded history
+		r_t = {}		# T x d; relation
+		a_t = {}		# T x d x 2(relation, next_node)
+		w_t_m = {}		# T x d; attention distribution
+		q_t_star = {}	# T x d; attention weighted question
+
+		e_t[1] = e_s
+		h_t[1] = set()		# OR LIST????
+		S_t[1] = State(q, e_s, e_t[1], h_t[1])
+		q_vector = self.bigru(q)					# BiGRU Module
+		H_t[0] = np.zeros(d)
+		r_t[0] = np.zeros(d)
+		
+		self.env.start_new_query(S_t[1], ans)
+		
+		for t in range(1, T+1):
+			q_t[t] = self.slp(q_vector)				# Single-Layer Perceptron Module
+			H_t[t] = self.gru(H_t[t-1], r_t[t-1])	# History Encoder Module
+			possible_actions = env.get_possible_actions()
+			action_space = self.beam_search(possible_actions)
+
+			semantic_scores = []
+			for action in action_space:
+				# Attention Layer: Generate Similarity Scores between q and r and current point of attention
+				r_star = self.embed(action[0])
+				q_t_star[t] = self.attention(r_star, q_t[t])
+
+				# Perceptron Module: Generate Semantic Score for action given q
+				score = self.perceptron(r_star, H_t[t], q_t_star[t])
+				semantic_scores.append(score)
+			
+			# Softmax Module: Leading to selection of action according to policy
+			action_prob = self.softmax(semantic_scores)
+			action = self.sample_action(action_distribution)
+			a_t[t] = action
+
+			# Take action, advance state, and get reward
+			# q_t & H_t passed in order to generate the new State object within Environment
+			new_state, new_reward = env.transit(action, t, q_t, H_t)
+			S_t[t+1] = new_state
+			
+			# Record action, state and reward
+			trajectory += [S_t[t], a_t[t]]
+			#TODO: Implement discount factor
+			rewards.append(new_reward)
+			action_probs.append(action_prob)
+			actions_onehot.append(np_utils.to_categorical(action, num_classes=len(action_prob)))
+
+		prediction = S_t[-1].e_t
+		rewards = pad_sequences(rewards,padding='post')
+		action_probs = pad_sequences(action_probs,padding='post')
+		actions_onehot = pad_sequences(actions_onehot,padding='post')
+
+		return prediction, [actions_onehot,action_probs,reward]
+
+
+	def REINFORCE_loss_function(outputs):
+		actions_onehot, action_probs, reward = outputs
+		action_prob = K.sum(action_probs * actions_onehot, axis=1)
+		log_action_prob = K.log(action_prob)
+		loss = - log_action_prob * reward
+		return K.mean(loss)
+
 
 	# TRAINABLE
 	def bigru(self, q):
@@ -211,15 +242,11 @@ class PolicyNetwork():
 
 		return beamed_actions
 
-	def generate_action_distribution(self, actions, semantic_scores):
-		probabilities = self.softmax(semantic_scores)
-		return sorted(list(zip(actions, probabilities)), key=lambda x: x[0][0])		# action_distribution is sorted alphabetically based on the relation
 		
-	def sample_action(self, action_distribution):
-		# Separates list of (action, prob) to actions list and probs list
-		actions, probs = list(zip(*action_distribution))
+	def sample_action(self, actions, probs):
 		sampled_index = np.random.choice(len(actions), p=probs)
 		return actions[sampled_index]
+
 
 	def softmax(self, vectors):
 		return np.exp(vectors) / np.sum(np.exp(vectors))

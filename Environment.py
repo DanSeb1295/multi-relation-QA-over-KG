@@ -52,7 +52,7 @@ class Rewards():
 		Q_t = np.zeros(d)
 		for i in range(1, t):
 			for j in range(n):
-				Q_t += q_t[t][j]
+				Q_t += q_t[i][j]
 		
 		norm_product = (norm(Q_t) * norm(H_t))
 		if norm_product == 0:
