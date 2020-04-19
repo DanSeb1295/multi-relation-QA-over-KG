@@ -102,59 +102,18 @@ class PolicyNetwork():
 
 
 	def run_val_op(self, val_set, predictions = False):
-		# Hyperparameters configuration
-		self.beam_size = 32
-		T = self.T
-		knowledge_graph = self.KG
+	        # Hyperparameters configuration
+	        self.beam_size = 32
+	        T = self.T
+	        n = len(val_set)
+	        y_hat = []
 
-		# TODO: Define TF loss function
-		# TODO: Redo in TF
-		total_reward = 0
-		for q, e_s, ans in train_set:
-			trajectory = []
-			rewards = []
-			q = [self.Embedder.embed_word(w) for w in q]	# Embedding Module
-			n = len(q)
-
-			e_t = {}		# T x 1
-			h_t = {}		# T x set()
-			S_t = {}		# T x States
-			q_t = {}		# T x d x n
-			H_t = {}		# T x d
-			r_t = {}		# T x d
-			a_t = {}		# T x d x 2(relation, node)
-			w_t_m = {}		# T x d
-			q_t_star = {}	# T x d
-
-			e_t[1] = e_s
-			h_t[1] = set()		# OR LIST????
-			S_t[1] = State(q, e_s, e_t[1], h_t[1])
-			q_vector = self.bigru(q)					# BiGRU Module
-			H_t[0] = np.zeros(d)
-			r_t[0] = np.zeros(d)
-			
-			self.env.start_new_query(S_t[1], ans)
-			
-			for t in range(1, T+1):
-				q_t[t] = self.slp(q_vector, t)				# Single-Layer Perceptron Module
-				H_t[t] = self.gru(r_t[t-1])		# History Encoder Module
-				possible_actions = env.get_possible_actions()
-				action_space = self.beam_search(possible_actions)
-
-				semantic_scores = []
-				for action in action_space:
-					# Attention Layer: Generate Similarity Scores between q and r and current point of attention
-					r_star = self.Embedder.embed_relation(action[0])
-					q_t_star[t] = self.attention(r_star, q_t[t])
-
-					# Perceptron Module: Generate Semantic Score for action given q
-					score = self.perceptron(r_star, H_t[t], q_t_star[t])
-					semantic_scores.append(score)
-				
-				# Softmax Module: Leading to selection of action according to policy
-				action_distribution = self.generate_action_distribution(action_space, semantic_scores)
-				action = self.sample_action(action_distribution)
-				a_t[t] = action
+	        for inputs in val_set:
+	            predictions, outputs = pred_forward(inputs)
+	            y_hat.append(y_pred)
+	        if predictions:
+	            acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
+	        return acc, y_hat
 
 
 	def forward(self, inputs):
