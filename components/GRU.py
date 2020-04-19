@@ -2,17 +2,25 @@ import tensorflow as tf
 from Environment import d
 
 dropout = 0.3
+KEEP_PROB = 1 - dropout
 initializer = tf.contrib.layers.xavier_initializer()
 
 class GRU():
 	def __init__(self):
-		# TODO: DROPOUT
-		cell_1 = tf.nn.rnn_cell.GRUCell(d, dropout=dropout, recurrent_dropout=dropout, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
-		cell_2 = tf.nn.rnn_cell.GRUCell(d, dropout=dropout, recurrent_dropout=dropout, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
-		cell_3 = tf.nn.rnn_cell.GRUCell(d, dropout=dropout, recurrent_dropout=dropout, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
-		self.GRU = tf.nn.rnn_cell.MultiRNNCell([cell_1, cell_2, cell_3])
+		cell_1 = tf.nn.rnn_cell.GRUCell(d, kernel_initializer=initializer, bias_initializer=initializer)
+		cell_2 = tf.nn.rnn_cell.GRUCell(d, kernel_initializer=initializer, bias_initializer=initializer)
+		cell_3 = tf.nn.rnn_cell.GRUCell(d, kernel_initializer=initializer, bias_initializer=initializer)
+		
+		self.cell_1 = tf.nn.rnn_cell.DropoutWrapper(cell_1, output_keep_prob=KEEP_PROB, state_keep_prob=KEEP_PROB, input_keep_prob=KEEP_PROB)
+		self.cell_2 = tf.nn.rnn_cell.DropoutWrapper(cell_2, output_keep_prob=KEEP_PROB, state_keep_prob=KEEP_PROB, input_keep_prob=KEEP_PROB)
+		self.cell_3 = tf.nn.rnn_cell.DropoutWrapper(cell_3, output_keep_prob=KEEP_PROB, state_keep_prob=KEEP_PROB, input_keep_prob=KEEP_PROB)
+		self.states = (np.zeros(d), np.zeros(d), np.zeros(d))
 
 	def compute(self, r_t):
-		# TODO: DOES THIS RETAIN PREVIOUS TIMESTEPS?
-		H_t_1, _ = tf.nn.static_rnn(self.GRU, [r_t])
+		state_1, state_2, state_3 = self.states
+		output_1, state_1 = self.cell_1(r_t, state_1)
+		output_2, state_2 = self.cell_2(output_1, state_2)
+		H_t_1, state_3 = self.cell_3(output_2, state_3)
+		self.states = (state_1, state_2, state_3)
+
 		return H_t_1
