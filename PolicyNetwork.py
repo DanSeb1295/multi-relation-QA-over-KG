@@ -36,7 +36,7 @@ class PolicyNetwork():
 
 	def initialise_models(self):
 		self.GRU = GRU()
-		self.Perceptron = Perceptron
+		self.Perceptron = Perceptron()
 		self.Attention = Attention()
 		self.BiGRU = BiGRU()
 		self.SLP = SLP(self.T)
