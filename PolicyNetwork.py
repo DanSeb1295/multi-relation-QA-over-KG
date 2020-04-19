@@ -20,18 +20,17 @@ class PolicyNetwork():
 		self.opt = tf.train.AdamOptimizer(learning_rate = self.lr)
 		self.sess = tf.Session()
 
+		self.initialise_models()
+
 		if saved_model_path:
 			self.load_saved_model(saved_model_path)
-		else:
-			self.initialise_models()
 
 	def load_saved_model(self, sess, saved_model_path):
-		self.initialise_models()
 		try:
 			saver = tf.train.import_meta_graph(saved_model_path)
 			saver.restore(self.sess, tf.train.latest_checkpoint('./'))
 		except:
-			print('no load file, starting from scratch')
+			print('Load failed. Starting with a new network.')
 			
 
 	def initialise_models(self):
