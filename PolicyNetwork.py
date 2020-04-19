@@ -40,7 +40,7 @@ class PolicyNetwork():
 		self.Attention = Attention()
 		self.BiGRU = BiGRU()
 		self.SLP = SLP(self.T)
-		self.Embedder = Embedder
+		self.Embedder = Embedder()
 
 
 	def train(self, inputs, epochs=10, attention=True, perceptron=True):
