@@ -96,7 +96,7 @@ class PolicyNetwork():
 		for q, e_s, ans in train_set:
 			trajectory = []
 			rewards = []
-			q = self.embed(q)							# Embedding Module
+			q = [self.Embedder.embed_word(w) for w in q]	# Embedding Module
 			n = len(q)
 
 			e_t = {}		# T x 1
@@ -127,7 +127,7 @@ class PolicyNetwork():
 				semantic_scores = []
 				for action in action_space:
 					# Attention Layer: Generate Similarity Scores between q and r and current point of attention
-					r_star = self.embed(action[0])
+					r_star = self.Embedder.embed_relation(action[0])
 					q_t_star[t] = self.attention(r_star, q_t[t])
 
 					# Perceptron Module: Generate Semantic Score for action given q
@@ -188,10 +188,6 @@ class PolicyNetwork():
 	def perceptron(self, r_star, H_t, q_t_star):
 		# Returns: S(a_t, q) = r_star * W_L2 * ReLU(W_L1 * [H_t; q_t_star])
 		return self.Perceptron.compute(r_star, H_t, q_t_star)
-
-	# PRE-TRAINED
-	def embed(self, vector):
-		return self.Embedder.embed(vector)
 
 	def beam_search(self, possible_actions, beam_size = None):
 		if not beam_size:
