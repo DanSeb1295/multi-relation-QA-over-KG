@@ -14,12 +14,9 @@ class PolicyNetwork():
 		self.env = None
 		self.beam_size = 1
 		self.lr = 1e-3
-<<<<<<< HEAD
 		self.ita_discount = 0.8
 		self.opt = tf.train.AdamOptimizer(learning_rate = self.lr)
-=======
 		self.sess = tf.Session()
->>>>>>> 4deeb4ac57bd3cac901cd9b90534e0c79e3cee3c
 
 		if saved_model_path:
 			self.load_saved_model(saved_model_path)
@@ -108,18 +105,6 @@ class PolicyNetwork():
 		# Hyperparameters configuration
 		self.beam_size = 32
 		T = self.T
-<<<<<<< HEAD
-		n = len(val_set)
-		y_hat = []
-
-		for inputs in val_set:
-			predictions, outputs = pred_forward(inputs)
-			y_hat.append(y_pred)
-		if predictions:
-			acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
-		return acc, y_hat
-		
-=======
 		knowledge_graph = self.KG
 
 		# TODO: Define TF loss function
@@ -170,7 +155,6 @@ class PolicyNetwork():
 				action_distribution = self.generate_action_distribution(action_space, semantic_scores)
 				action = self.sample_action(action_distribution)
 				a_t[t] = action
->>>>>>> 4deeb4ac57bd3cac901cd9b90534e0c79e3cee3c
 
 
 	def forward(self, inputs):
