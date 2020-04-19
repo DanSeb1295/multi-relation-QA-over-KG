@@ -125,7 +125,7 @@ class PolicyNetwork():
 		action_probs = []
 		actions_onehot = []
 		
-		q = self.embed(q)
+		q = self.Embedder.embed_word(q)
 		q = tf.convert_to_tensor(q)							# Embedding Module
 		n = len(q)
 
@@ -157,7 +157,7 @@ class PolicyNetwork():
 			semantic_scores = []
 			for action in action_space:
 				# Attention Layer: Generate Similarity Scores between q and r and current point of attention
-				r_star = self.embed(action[0])
+				r_star = self.Embedder.embed_relation(action[0])
 				q_t_star[t] = self.attention(r_star, q_t[t])
 
 				# Perceptron Module: Generate Semantic Score for action given q
