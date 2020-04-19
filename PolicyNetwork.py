@@ -6,7 +6,9 @@ import tensorflow as tf
 from tf import keras
 from keras import backend as K
 from keras.preprocessing.sequence import pad_sequences
+from keras import utils as np_utils
 from tqdm import tqdm
+
 
 class PolicyNetwork():
 	def __init__(self, T, saved_model_path: str = ''):
@@ -96,8 +98,8 @@ class PolicyNetwork():
 		# Hyperparameters configuration
 		self.beam_size = 1
 		for inputs in train_set:
-			predictions, outputs = forward(inputs)
-			loss = REINFORCE_loss_function(outputs)
+			predictions, outputs = self.forward(inputs)
+			loss = self.REINFORCE_loss_function(outputs)
 			self.opt.minimize(loss)
 
 
@@ -109,7 +111,7 @@ class PolicyNetwork():
 	        y_hat = []
 
 	        for inputs in val_set:
-	            predictions, outputs = pred_forward(inputs)
+	            predictions, outputs = self.forward(inputs)
 	            y_hat.append(y_pred)
 	        if predictions:
 	            acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
@@ -151,7 +153,7 @@ class PolicyNetwork():
 		for t in range(1, T+1):
 			q_t[t] = self.slp(q_vector)				# Single-Layer Perceptron Module
 			H_t[t] = self.gru(H_t[t-1], r_t[t-1])	# History Encoder Module
-			possible_actions = env.get_possible_actions()
+			possible_actions = self.env.get_possible_actions()
 			action_space = self.beam_search(possible_actions)
 
 			semantic_scores = []
@@ -171,7 +173,7 @@ class PolicyNetwork():
 
 			# Take action, advance state, and get reward
 			# q_t & H_t passed in order to generate the new State object within Environment
-			new_state, new_reward = env.transit(action, t, q_t, H_t)
+			new_state, new_reward = self.env.transit(action, t, q_t, H_t)
 			S_t[t+1] = new_state
 			
 			# Record action, state and reward
@@ -182,18 +184,29 @@ class PolicyNetwork():
 			actions_onehot.append(np_utils.to_categorical(action, num_classes=len(action_prob)))
 
 		prediction = S_t[-1].e_t
-		rewards = pad_sequences(rewards,padding='post')
+		discount_r = self.discount_rewards(rewards)
 		action_probs = pad_sequences(action_probs,padding='post')
 		actions_onehot = pad_sequences(actions_onehot,padding='post')
 
-		return prediction, [actions_onehot,action_probs,reward]
+		return prediction, [actions_onehot,action_probs,discount_r]
 
 
-	def REINFORCE_loss_function(outputs):
-		actions_onehot, action_probs, reward = outputs
+	def discount_rewards(self, rewards):
+        discounted_r = np.zeros_like(rewards)
+        running_add = 0
+        for t in reversed(range(0, rewards.size)):
+            if rewards[t] != 0:
+                running_add = 0
+            running_add = running_add * self.ita_discount + rewards[t]
+            discounted_r[t] = running_add
+		discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-7)
+        return discounted_r
+
+	def REINFORCE_loss_function(self, outputs):
+		actions_onehot, action_probs, rewards = outputs
 		action_prob = K.sum(action_probs * actions_onehot, axis=1)
 		log_action_prob = K.log(action_prob)
-		loss = - log_action_prob * reward
+		loss = - log_action_prob * rewards
 		return K.mean(loss)
 
 
