@@ -2,12 +2,13 @@ from PolicyNetwork import PolicyNetwork
 from Environment import Environment
 from util import prep_dataset
 from matplotlib.pyplot import plt
+#TODO  set seeds for tf and np
 
 epochs = 10
 checkpoint = 60		# Every _ Minutes
 
-path_KB = ''
-path_QA = ''
+path_KB = r"datasets\3H-kb.txt"
+path_QA = r"datasets\PQ-3H.txt"
 
 # Experiment Settings
 T = 2				# To change according to QA type

@@ -2,6 +2,7 @@ import networkx as nx
 import pandas as pd
 from math import ceil
 import numpy as np
+import tensorflow as tf
 
 
 seed = 2020
@@ -78,4 +79,4 @@ def save_checkpoint(policy_network, save_path, write_meta_graph=False):
     '''
     saver = tf.train.Saver()
     saver.save(policy_network.sess, save_path, max_to_keep=5, keep_checkpoint_every_n_hours=1,
-               global_step=1000, write_meta_graph=write_meta_graph)
+               write_meta_graph=write_meta_graph)

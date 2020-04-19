@@ -21,9 +21,10 @@ class PolicyNetwork():
 			self.initialise_models()
 
 	def load_saved_model(self, sess, saved_model_path):
+		self.initialise_models()
 		try:
 			'''
-			TODO: LOAD MODELS
+			 LOAD MODELS
 				# self.Embedder = Embedder
 				# self.BiGRU = BiGRU 
 				# self.SLP = SLP
@@ -34,7 +35,8 @@ class PolicyNetwork():
 			saver = tf.train.import_meta_graph(saved_model_path)
 			saver.restore(self.sess, tf.train.latest_checkpoint('./'))
 		except:
-			self.initialise_models()
+			print('no load file')
+			
 
 	def initialise_models(self):
 		# TODO: self.embedder = Embedder
