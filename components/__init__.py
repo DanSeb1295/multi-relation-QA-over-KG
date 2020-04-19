@@ -4,3 +4,5 @@ from .GRU import GRU
 from .Perceptron import Perceptron
 from .SLP import SLP
 from .Attention import Attention
+from .EntityLinker import EntityLinker
+from .Embedder import Embedder

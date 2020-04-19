@@ -28,29 +28,19 @@ class PolicyNetwork():
 	def load_saved_model(self, sess, saved_model_path):
 		self.initialise_models()
 		try:
-			'''
-			 LOAD MODELS
-				# self.Embedder = Embedder
-				# self.BiGRU = BiGRU 
-				# self.SLP = SLP
-				# self.Attention = Attention
-				# self.GRU = GRU
-				# self.Perceptron = Perceptron
-			'''
 			saver = tf.train.import_meta_graph(saved_model_path)
 			saver.restore(self.sess, tf.train.latest_checkpoint('./'))
 		except:
-			print('no load file')
+			print('no load file, starting from scratch')
 			
 
 	def initialise_models(self):
-		# TODO: self.embedder = Embedder
 		self.GRU = GRU()
 		self.Perceptron = Perceptron
 		self.Attention = Attention()
 		self.BiGRU = BiGRU()
 		self.SLP = SLP(self.T)
-
+		self.Embedder = Embedder
 
 
 	def train(self, inputs, epochs=10, attention=True, perceptron=True):
@@ -65,18 +55,27 @@ class PolicyNetwork():
 		if not self.env:
 			self.env = Environment(KG)
 
-		with tf.Session() as sess:
-			K.set_session(sess)
-			sess.run(tf.global_variables_initializer())
+
+		with self.sess:
+			K.set_session(self.sess)
+			self.sess.run(tf.global_variables_initializer())
 
 			train_acc = []
 			val_acc = []
-			for epoch in epochs:
+			for epoch in range(epochs):
 				epoch_train_acc = self.run_train_op(train_set)
 				epoch_val_acc = self.run_val_op(test_set)
 				
 				train_acc.append(epoch_train_acc)
 				val_acc.append(epoch_val_acc)
+				
+				# save results and weights
+				with open("results.txt", "a+") as f:
+					f.write("Iteration %s - train acc: %d, val acc: %d" % (epoch, epoch_train_acc, epoch_val_acc))
+				if epoch == 1:
+					save_checkpoint(self, 'model', epoch,write_meta_graph=True)
+				else:
+					save_checkpoint(self,'model',epoch)
 
 		return train_acc, val_acc
 
@@ -101,7 +100,7 @@ class PolicyNetwork():
 			predictions, outputs = self.forward(inputs)
 			loss = self.REINFORCE_loss_function(outputs)
 			self.opt.minimize(loss)
-
+		return loss
 
 	def run_val_op(self, val_set, predictions = False):
 	        # Hyperparameters configuration
@@ -202,8 +201,13 @@ class PolicyNetwork():
 		discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-7)
         return discounted_r
 
+<<<<<<< HEAD
 	def REINFORCE_loss_function(self, outputs):
 		actions_onehot, action_probs, rewards = outputs
+=======
+	def REINFORCE_loss_function(self,outputs):
+		actions_onehot, action_probs, reward = outputs
+>>>>>>> b6f959fcdbca2ffc287cb4c6a6e5b3e508ca741b
 		action_prob = K.sum(action_probs * actions_onehot, axis=1)
 		log_action_prob = K.log(action_prob)
 		loss = - log_action_prob * rewards
