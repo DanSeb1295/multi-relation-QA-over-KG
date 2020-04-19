@@ -68,7 +68,7 @@ def train_test_split(dataset, seed=seed, train_split=train_split):
 	return train_set, test_set
 
 
-def save_checkpoint(policy_network, save_path, write_meta_graph=False):
+def save_checkpoint(policy_network, save_path, step, write_meta_graph=False):
 	'''
 	Input: PolicyNetwork
 	Return: None
@@ -79,4 +79,4 @@ def save_checkpoint(policy_network, save_path, write_meta_graph=False):
 	'''
 	saver = tf.train.Saver()
 	saver.save(policy_network.sess, save_path, max_to_keep=5, keep_checkpoint_every_n_hours=1,
-			   write_meta_graph=write_meta_graph)
+			   global_step=step, write_meta_graph=write_meta_graph)

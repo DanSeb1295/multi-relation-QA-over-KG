@@ -26,29 +26,19 @@ class PolicyNetwork():
 	def load_saved_model(self, sess, saved_model_path):
 		self.initialise_models()
 		try:
-			'''
-			 LOAD MODELS
-				# self.Embedder = Embedder
-				# self.BiGRU = BiGRU 
-				# self.SLP = SLP
-				# self.Attention = Attention
-				# self.GRU = GRU
-				# self.Perceptron = Perceptron
-			'''
 			saver = tf.train.import_meta_graph(saved_model_path)
 			saver.restore(self.sess, tf.train.latest_checkpoint('./'))
 		except:
-			print('no load file')
+			print('no load file, starting from scratch')
 			
 
 	def initialise_models(self):
-		# TODO: self.embedder = Embedder
 		self.GRU = GRU()
 		self.Perceptron = Perceptron
 		self.Attention = Attention()
 		self.BiGRU = BiGRU()
 		self.SLP = SLP(self.T)
-
+		self.Embedder = Embedder
 
 
 	def train(self, inputs, epochs=10, attention=True, perceptron=True):
@@ -69,12 +59,20 @@ class PolicyNetwork():
 
 			train_acc = []
 			val_acc = []
-			for epoch in epochs:
+			for epoch in range(epochs):
 				epoch_train_acc = self.run_train_op(train_set)
 				epoch_val_acc = self.run_val_op(test_set)
 				
 				train_acc.append(epoch_train_acc)
 				val_acc.append(epoch_val_acc)
+				
+				# save results and weights
+				with open("results.txt", "a+") as f:
+					f.write("Iteration %s - train acc: %d, val acc: %d" % (epoch, epoch_train_acc, epoch_val_acc))
+				if epoch == 1:
+					save_checkpoint(self, 'model', epoch,write_meta_graph=True)
+				else:
+					save_checkpoint(self,'model',epoch)
 
 		return train_acc, val_acc
 
@@ -96,10 +94,10 @@ class PolicyNetwork():
 		# Hyperparameters configuration
 		self.beam_size = 1
 		for inputs in train_set:
-			predictions, outputs = forward(inputs)
-			loss = REINFORCE_loss_function(outputs)
+			predictions, outputs = self.forward(inputs)
+			loss = self.REINFORCE_loss_function(outputs)
 			self.opt.minimize(loss)
-
+		return loss
 
 	def run_val_op(self, val_set, predictions = False):
 	        # Hyperparameters configuration
@@ -171,7 +169,7 @@ class PolicyNetwork():
 
 			# Take action, advance state, and get reward
 			# q_t & H_t passed in order to generate the new State object within Environment
-			new_state, new_reward = env.transit(action, t, q_t, H_t)
+			new_state, new_reward = self.env.transit(action, t, q_t, H_t)
 			S_t[t+1] = new_state
 			
 			# Record action, state and reward
@@ -189,7 +187,7 @@ class PolicyNetwork():
 		return prediction, [actions_onehot,action_probs,reward]
 
 
-	def REINFORCE_loss_function(outputs):
+	def REINFORCE_loss_function(self,outputs):
 		actions_onehot, action_probs, reward = outputs
 		action_prob = K.sum(action_probs * actions_onehot, axis=1)
 		log_action_prob = K.log(action_prob)

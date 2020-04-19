@@ -2,10 +2,18 @@ from PolicyNetwork import PolicyNetwork
 from Environment import Environment
 from util import prep_dataset
 from matplotlib.pyplot import plt
-#TODO  set seeds for tf and np
+import pandas as pd
+
+# set seeds for np and tf
+import numpy as np
+import tensorflow as tf
+seed = 1
+np.random.seed(seed)
+tf.random.set_seed(seed)
 
 epochs = 10
 
+# paths for the KG and QA files
 path_KB = r"datasets\3H-kb.txt"
 path_QA = r"datasets\PQ-3H.txt"
 
@@ -19,7 +27,7 @@ KG, dataset = prep_dataset(path_KB, path_QA)
 inputs = (KG, dataset, T)
 
 # Initialise Policy Network
-saved_model_path = ''
+saved_model_path = 'model.meta'
 policy_network = PolicyNetwork(T, saved_model_path)
 
 # Run Experiments
@@ -28,8 +36,6 @@ train_acc_per, val_acc_per = policy_network.train(inputs, epochs=epochs, attenti
 train_acc_att, val_acc_att = policy_network.train(inputs, epochs=epochs, perceptron=False)		# Model does not use perceptron layer
 
 # TODO: Plot Results
-import pandas as pd
-import numpy as np
 print(pd.DataFrame({'SRN': [np.mean(val_acc_att_per)], 'w/o Attention': [np.mean(val_acc_per)],
                     'w/o Perceptron': [np.mean(val_acc_att)]}, index=["PQ-2H"]).T)
 
