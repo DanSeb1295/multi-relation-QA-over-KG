@@ -21,7 +21,6 @@ class PolicyNetwork():
 		self.sess = tf.Session()
 
 		self.initialise_models()
-
 		if saved_model_path:
 			self.load_saved_model(saved_model_path)
 
