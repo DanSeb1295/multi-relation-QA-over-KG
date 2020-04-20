@@ -93,34 +93,34 @@ class PolicyNetwork():
 
     def run_train_op(self, train_set, predictions = False):
         # Hyperparameters configuration
-            self.beam_size = 1
-            y_hat = []
-            with tf.GradientTape() as tape:
-                for inputs in tqdm(train_set):
-                    predictions, outputs = self.forward(inputs)
-                    loss = self.REINFORCE_loss_function(outputs)
-                    self.opt.minimize(loss)
-                    y_hat.append(predictions)
+        self.beam_size = 1
+        y_hat = []
+        with tf.GradientTape() as tape:
+            for inputs in tqdm(train_set):
+                predictions, outputs = self.forward(inputs)
+                loss = self.REINFORCE_loss_function(outputs)
+                self.opt.minimize(loss)
+                y_hat.append(predictions)
 
-            acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
-            results = (acc, y_hat) if predictions else acc
+        acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
+        results = (acc, y_hat) if predictions else acc
         return results
 
 
     def run_val_op(self, val_set, predictions = False):
-            # Hyperparameters configuration
-            self.beam_size = 32
-            T = self.T
-            n = len(val_set)
-            y_hat = []
+        # Hyperparameters configuration
+        self.beam_size = 32
+        T = self.T
+        n = len(val_set)
+        y_hat = []
 
-            for inputs in tqdm(val_set):
-                predictions, outputs = self.forward(inputs)
-                y_hat.append(y_pred)
+        for inputs in tqdm(val_set):
+            predictions, outputs = self.forward(inputs)
+            y_hat.append(y_pred)
 
-            acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
-            results = (acc, y_hat) if predictions else acc
-            return results
+        acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
+        results = (acc, y_hat) if predictions else acc
+        return results
 
 
     def forward(self, inputs):
