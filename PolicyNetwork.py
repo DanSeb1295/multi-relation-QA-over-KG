@@ -115,7 +115,6 @@ class PolicyNetwork():
         # Hyperparameters configuration
         self.beam_size = 32
         T = self.T
-        n = len(val_set)
         y_hat = []
 
         for inputs in tqdm(val_set):
@@ -125,7 +124,7 @@ class PolicyNetwork():
             except:
                 print('Skipped one input tuple')
                 continue
-        acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
+        acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
         results = (acc, y_hat) if predictions else acc
         return results
 
