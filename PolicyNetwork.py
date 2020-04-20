@@ -99,8 +99,11 @@ class PolicyNetwork():
             for inputs in tqdm(train_set):
                 try:
                     predictions, outputs = self.forward(inputs)
+                    print('checkpoint1')
                     loss = self.REINFORCE_loss_function(outputs)
+                    print('checkpoint2')
                     self.opt.minimize(loss)
+                    print('checkpoint3')
                     y_hat.append(predictions)
                 except:
                     print('Skipped one input tuple')
