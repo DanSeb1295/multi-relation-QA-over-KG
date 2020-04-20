@@ -1,7 +1,7 @@
 from PolicyNetwork import PolicyNetwork
 from Environment import Environment
 from util import prep_dataset
-from matplotlib.pyplot import plt
+from matplotlib import pyplot as plt
 import pandas as pd
 
 # set seeds for np and tf
