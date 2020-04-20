@@ -19,7 +19,7 @@ class Attention():
             output = tf.multiply(r_star, w_t_m)
             b_star = tf.matmul(self.W, output) + self.b
             beta_stars.append(b_star)
-        alpha_stars tf.nn.softmax(beta_stars)
+        alpha_stars = tf.nn.softmax(beta_stars)
         
         q_t_stars = []
         for i, a_star in enumerate(alpha_stars):
