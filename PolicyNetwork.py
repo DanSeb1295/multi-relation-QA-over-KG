@@ -103,6 +103,7 @@ class PolicyNetwork():
                     self.opt.minimize(loss)
                     y_hat.append(predictions)
                 except:
+                    print('Skipped one input tuple')
                     continue
             acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
             results = (acc, y_hat) if predictions else acc
@@ -122,6 +123,7 @@ class PolicyNetwork():
                 predicictions, outputs = self.forward(inputs)
                 y_hat.append(y_pred)
             except:
+                print('Skipped one input tuple')
                 continue
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
         results = (acc, y_hat) if predictions else acc
