@@ -134,7 +134,7 @@ class PolicyNetwork():
 
         temp_q = np.array([])
         for w in q:
-            if self.Embedder.embed_word(w):
+            if self.Embedder.embed_word(w) is None:
                 np.append(temp_q, self.Embedder.embed_word(w), axis=0)
         q = temp_q
         print('>>>', q, q.shape)
@@ -154,7 +154,7 @@ class PolicyNetwork():
         e_t[1] = e_s
         h_t[1] = set()        # OR LIST????
         S_t[1] = State(q, e_s, e_t[1], h_t[1])
-        q_vector = self.bigru(q)                    # BiGRU Module
+        q_vector = self.bigru(q)                   # BiGRU Module
         H_t[0] = np.zeros(d)
         r_t[0] = np.zeros(d)
         
