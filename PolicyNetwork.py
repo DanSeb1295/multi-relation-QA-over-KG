@@ -131,8 +131,12 @@ class PolicyNetwork():
         rewards = []
         action_probs = []
         actions_onehot = []
-        
-        q = np.array([self.Embedder.embed_word(w) for w in q])
+
+        temp_q = np.array([])
+        for w in q:
+            if self.Embedder.embed_word(w):
+                np.append(temp_q, self.Embedder.embed_word(w), axis=0)
+        q = temp_q
         print('>>>', q, q.shape)
         q = tf.convert_to_tensor(value=q)                         # Embedding Module
         n = len(q)
@@ -166,11 +170,14 @@ class PolicyNetwork():
             for action in action_space:
                 # Attention Layer: Generate Similarity Scores between q and r and current point of attention
                 r_star = self.Embedder.embed_relation(action[0])
-                q_t_star[t] = self.attention(r_star, q_t[t])
+                if r_star:
+                    q_t_star[t] = self.attention(r_star, q_t[t])
 
-                # Perceptron Module: Generate Semantic Score for action given q
-                score = self.perceptron(r_star, H_t[t], q_t_star[t])
-                semantic_scores.append(score)
+                    # Perceptron Module: Generate Semantic Score for action given q
+                    score = self.perceptron(r_star, H_t[t], q_t_star[t])
+                    semantic_scores.append(score)
+                else:
+                    continue
             
             # Softmax Module: Leading to selection of action according to policy
             action_prob = self.softmax(semantic_scores)
