@@ -3,10 +3,9 @@ from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
 from util import train_test_split, save_checkpoint
 import numpy as np
 import tensorflow as tf
-from tensorflow.compat.v1 import keras
-from keras import backend as K
-from keras.preprocessing.sequence import pad_sequences
-from keras import utils as np_utils
+from tensorflow.compat.v1.keras import backend as K
+from tensorflow.compat.v1.keras.preprocessing.sequence import pad_sequences
+from tensorflow.compat.v1.keras import utils as np_utils
 from tqdm import tqdm
 
 
@@ -55,7 +54,7 @@ class PolicyNetwork():
 
 
         with self.sess:
-            K.set_session(self.sess)
+            # K.set_session(self.sess)
             self.sess.run(tf.global_variables_initializer())
 
             train_acc = []
