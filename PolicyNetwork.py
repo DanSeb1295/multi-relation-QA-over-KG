@@ -132,7 +132,7 @@ class PolicyNetwork():
         for inputs in tqdm(val_set):
             try:
                 print('checkpoint5')
-                predicictions, outputs = self.forward(inputs)
+                predictions, outputs = self.forward(inputs)
                 print('checkpoint6')
                 y_hat.append(y_pred)
             except Exception as e:
@@ -153,8 +153,13 @@ class PolicyNetwork():
         action_probs = []
         actions_onehot = []
 
-        q = [self.Embedder.embed_word(w) for w in q]
-        assert(np.all(q)) # Make sure words are all embedded
+        temp_q = np.array([])
+        for w in q:
+            embeded_word = self.Embedder.embed_word(w)
+            if embeded_word:
+                temp_q = np.append(temp_q, embeded_word, axis = 0)
+
+        
         print('>>>', q, q.shape)
         q = tf.convert_to_tensor(value=q)                         # Embedding Module
         n = len(q)
