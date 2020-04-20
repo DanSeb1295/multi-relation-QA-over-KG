@@ -97,17 +97,17 @@ class PolicyNetwork():
         y_hat = []
         with tf.GradientTape() as tape:
             for inputs in tqdm(train_set):
-            	try:
-	                predictions, outputs = self.forward(inputs)
-	                loss = self.REINFORCE_loss_function(outputs)
-	                self.opt.minimize(loss)
-	                y_hat.append(predictions)
-	            except:
-	            	continue
-
-        acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
-        results = (acc, y_hat) if predictions else acc
+                try:
+                    predictions, outputs = self.forward(inputs)
+                    loss = self.REINFORCE_loss_function(outputs)
+                    self.opt.minimize(loss)
+                    y_hat.append(predictions)
+                except:
+                    continue
+            acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
+            results = (acc, y_hat) if predictions else acc
         return results
+
 
 
     def run_val_op(self, val_set, predictions = False):
@@ -118,11 +118,11 @@ class PolicyNetwork():
         y_hat = []
 
         for inputs in tqdm(val_set):
-        	try:
-            	predicictions, outputs = self.forward(inputs)
-            	y_hat.append(y_pred)
+            try:
+                predicictions, outputs = self.forward(inputs)
+                y_hat.append(y_pred)
             except:
-            	continue
+                continue
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
         results = (acc, y_hat) if predictions else acc
         return results
