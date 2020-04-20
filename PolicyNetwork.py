@@ -20,27 +20,25 @@ class PolicyNetwork():
 		self.opt = tf.train.AdamOptimizer(learning_rate = self.lr)
 		self.sess = tf.Session()
 
+		self.initialise_models()
 		if saved_model_path:
 			self.load_saved_model(saved_model_path)
-		else:
-			self.initialise_models()
 
 	def load_saved_model(self, sess, saved_model_path):
-		self.initialise_models()
 		try:
 			saver = tf.train.import_meta_graph(saved_model_path)
 			saver.restore(self.sess, tf.train.latest_checkpoint('./'))
 		except:
-			print('no load file, starting from scratch')
+			print('Load failed. Starting with a new network.')
 			
 
 	def initialise_models(self):
 		self.GRU = GRU()
-		self.Perceptron = Perceptron
+		self.Perceptron = Perceptron()
 		self.Attention = Attention()
 		self.BiGRU = BiGRU()
 		self.SLP = SLP(self.T)
-		self.Embedder = Embedder
+		self.Embedder = Embedder()
 
 
 	def train(self, inputs, epochs=10, attention=True, perceptron=True):
@@ -98,7 +96,7 @@ class PolicyNetwork():
 			self.beam_size = 1
 			y_hat = []
 			with tf.GradientTape() as tape:
-				for inputs in train_set:
+				for inputs in tqdm(train_set):
 					predictions, outputs = self.forward(inputs)
 					loss = self.REINFORCE_loss_function(outputs)
 					self.opt.minimize(loss)
@@ -108,6 +106,7 @@ class PolicyNetwork():
 	        results = (acc, y_hat) if predictions else acc
 		return results
 
+
 	def run_val_op(self, val_set, predictions = False):
 	        # Hyperparameters configuration
 	        self.beam_size = 32
@@ -115,7 +114,7 @@ class PolicyNetwork():
 	        n = len(val_set)
 	        y_hat = []
 
-	        for inputs in val_set:
+	        for inputs in tqdm(val_set):
 	            predictions, outputs = self.forward(inputs)
 	            y_hat.append(y_pred)
 

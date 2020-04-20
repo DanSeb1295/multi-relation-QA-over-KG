@@ -4,15 +4,14 @@ from Environment import d
 
 HIDDEN_DIM = d / 2
 dropout = 0.3
-initializer='xavier'
+initializer = tf.contrib.layers.xavier_initializer()
 
 class BiGRU():
-	# TODO: DROPOUT
 	def __init__(self):
-		self.fw_1 = keras.layers.GRU(HIDDEN_DIM, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
-		self.fw_2 = keras.layers.GRU(HIDDEN_DIM, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
-		self.bw_1 = keras.layers.GRU(HIDDEN_DIM, go_backwards=True, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
-		self.bw_2 = keras.layers.GRU(HIDDEN_DIM, go_backwards=True, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
+		self.fw_1 = keras.layers.GRU(HIDDEN_DIM, dropout=dropout, recurrent_dropout=dropout, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
+		self.fw_2 = keras.layers.GRU(HIDDEN_DIM, dropout=dropout, recurrent_dropout=dropout, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
+		self.bw_1 = keras.layers.GRU(HIDDEN_DIM, go_backwards=True, dropout=dropout, recurrent_dropout=dropout, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
+		self.bw_2 = keras.layers.GRU(HIDDEN_DIM, go_backwards=True, dropout=dropout, recurrent_dropout=dropout, kernel_initializer=initializer, recurrent_initializer=initializer, bias_initializer=initializer)
 
 	def compute(self, q):
 		fw_out_1 = self.fw_1(q)

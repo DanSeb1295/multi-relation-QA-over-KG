@@ -104,20 +104,21 @@ class Embedder:
 			try:
 				index = int(self.entity2id[mid])
 				print(index)
+				vector_index = index * 50
+				return self.entity_embedding[vector_index:vector_index+50]
 			except Exception as e:
 				print('Not found in entity2id', e)
 		except Exception as e:
 			print('Not found in mid_to_name', e)
-		vector_index = index * 50
-		return self.entity_embedding[vector_index:vector_index+50]
+		
 
 	#Try catch for finding the relation embeddings from Freebase
 	def embed_relation(self, relation):	
 		try:
 			index = int(self.relation2id[relation])
 			print(index)
+			vector_index = index * 50
+			return self.relation_embedding[vector_index:vector_index+50]
 		except Exception as e:
 			print('Not found in relation2id', e)
-		vector_index = index * 50
-		return self.relation_embedding[vector_index:vector_index+50]
 
