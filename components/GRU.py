@@ -15,9 +15,9 @@ class GRU():
         # self.cell_3 = tf.nn.rnn_cell.DropoutWrapper(cell_3, output_keep_prob=KEEP_PROB, state_keep_prob=KEEP_PROB, input_keep_prob=KEEP_PROB)
         # self.states = (np.zeros(d), np.zeros(d), np.zeros(d))
 
-        cell_1 = tf.keras.layers.GRU(d, dropout=dropout, recurrent_dropout=dropout) 
-        cell_2 = tf.keras.layers.GRU(d, dropout=dropout, recurrent_dropout=dropout) 
-        cell_3 = tf.keras.layers.GRU(d, dropout=dropout, recurrent_dropout=dropout) 
+        cell_1 = tf.keras.layers.GRUCell(d, dropout=dropout, recurrent_dropout=dropout) 
+        cell_2 = tf.keras.layers.GRUCell(d, dropout=dropout, recurrent_dropout=dropout) 
+        cell_3 = tf.keras.layers.GRUCell(d, dropout=dropout, recurrent_dropout=dropout) 
         self.GRU = tf.keras.layers.RNN([cell_1, cell_2, cell_3])
 
     def compute(self, r_t):
