@@ -17,7 +17,7 @@ class PolicyNetwork():
         self.beam_size = 1
         self.lr = 1e-3
         self.ita_discount = 0.9
-        self.opt = tf.train.AdamOptimizer(learning_rate = self.lr)
+        self.opt = tf.optimizers.Adam(learning_rate = self.lr)
         self.sess = tf.Session()
 
         self.initialise_models()
