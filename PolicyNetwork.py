@@ -3,10 +3,9 @@ from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
 from util import train_test_split, save_checkpoint
 import numpy as np
 import tensorflow as tf
-from tensorflow import keras
-from keras import backend as K
-from keras.preprocessing.sequence import pad_sequences
-from keras import utils as np_utils
+from tensorflow.keras import backend as K
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras import utils as np_utils
 from tqdm import tqdm
 
 
@@ -24,7 +23,7 @@ class PolicyNetwork():
         if saved_model_path:
             self.load_saved_model(saved_model_path)
 
-    def load_saved_model(self, sess, saved_model_path):
+    def load_saved_model(self, saved_model_path):
         try:
             saver = tf.train.import_meta_graph(saved_model_path)
             saver.restore(self.sess, tf.train.latest_checkpoint('./'))
