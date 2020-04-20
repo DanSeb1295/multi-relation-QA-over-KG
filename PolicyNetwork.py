@@ -97,10 +97,13 @@ class PolicyNetwork():
         y_hat = []
         with tf.GradientTape() as tape:
             for inputs in tqdm(train_set):
-                predictions, outputs = self.forward(inputs)
-                loss = self.REINFORCE_loss_function(outputs)
-                self.opt.minimize(loss)
-                y_hat.append(predictions)
+            	try:
+	                predictions, outputs = self.forward(inputs)
+	                loss = self.REINFORCE_loss_function(outputs)
+	                self.opt.minimize(loss)
+	                y_hat.append(predictions)
+	            except:
+	            	continue
 
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
         results = (acc, y_hat) if predictions else acc
@@ -115,9 +118,11 @@ class PolicyNetwork():
         y_hat = []
 
         for inputs in tqdm(val_set):
-            predictions, outputs = self.forward(inputs)
-            y_hat.append(y_pred)
-
+        	try:
+            	predicictions, outputs = self.forward(inputs)
+            	y_hat.append(y_pred)
+            except:
+            	continue
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
         results = (acc, y_hat) if predictions else acc
         return results
@@ -132,11 +137,8 @@ class PolicyNetwork():
         action_probs = []
         actions_onehot = []
 
-        temp_q = np.array([])
-        for w in q:
-            if self.Embedder.embed_word(w) is None:
-                np.append(temp_q, self.Embedder.embed_word(w), axis=0)
-        q = temp_q
+        q = [self.Embedder.embed_word(w) for w in q]
+        assert(None not in q) # Make sure words are all embedded
         print('>>>', q, q.shape)
         q = tf.convert_to_tensor(value=q)                         # Embedding Module
         n = len(q)
