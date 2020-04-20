@@ -18,9 +18,9 @@ path_KB = r"datasets\3H-kb.txt"
 path_QA = r"datasets\PQ-3H.txt"
 
 # Experiment Settings
-T = 2				# To change according to QA type
-attention = True	# Use Attention Model or not
-perceptron = True	# Use Perceptron for semantic similary scores
+T = 2               # To change according to QA type
+attention = True    # Use Attention Model or not
+perceptron = True   # Use Perceptron for semantic similary scores
 
 # Prep Data
 KG, dataset = prep_dataset(path_KB, path_QA)
@@ -31,9 +31,9 @@ saved_model_path = 'model.meta'
 policy_network = PolicyNetwork(T, saved_model_path)
 
 # Run Experiments
-train_acc_att_per, val_acc_att_per = policy_network.train(inputs, epochs=epochs)				# Model uses both attention & perceptro layers
-train_acc_per, val_acc_per = policy_network.train(inputs, epochs=epochs, attention=False)		# Model does not use attention layer
-train_acc_att, val_acc_att = policy_network.train(inputs, epochs=epochs, perceptron=False)		# Model does not use perceptron layer
+train_acc_att_per, val_acc_att_per = policy_network.train(inputs, epochs=epochs)                # Model uses both attention & perceptro layers
+train_acc_per, val_acc_per = policy_network.train(inputs, epochs=epochs, attention=False)       # Model does not use attention layer
+train_acc_att, val_acc_att = policy_network.train(inputs, epochs=epochs, perceptron=False)      # Model does not use perceptron layer
 
 # TODO: Plot Results
 print(pd.DataFrame({'SRN': [np.mean(val_acc_att_per)], 'w/o Attention': [np.mean(val_acc_per)],
