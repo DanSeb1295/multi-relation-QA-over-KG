@@ -158,6 +158,7 @@ class PolicyNetwork():
             embeded_word = self.Embedder.embed_word(w)
             if embeded_word.all():
                 temp_q = np.append(temp_q, embeded_word, axis = 0)
+        q = temp_q
 
         
         print('>>>', q, q.shape)
