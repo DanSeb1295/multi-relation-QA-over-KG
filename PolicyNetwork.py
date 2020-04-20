@@ -18,7 +18,7 @@ class PolicyNetwork():
         self.lr = 1e-3
         self.ita_discount = 0.9
         self.opt = tf.optimizers.Adam(learning_rate = self.lr)
-        self.sess = tf.Session()
+        self.sess = tf.compat.v1.Session()
 
         self.initialise_models()
         if saved_model_path:
