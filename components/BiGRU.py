@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tf import keras
+from tensorflow import keras
 from Environment import d
 
 HIDDEN_DIM = d / 2
