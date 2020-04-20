@@ -16,7 +16,7 @@ class PolicyNetwork():
 		self.env = None
 		self.beam_size = 1
 		self.lr = 1e-3
-		self.ita_discount = 0.8
+		self.ita_discount = 0.9
 		self.opt = tf.train.AdamOptimizer(learning_rate = self.lr)
 		self.sess = tf.Session()
 
@@ -46,7 +46,7 @@ class PolicyNetwork():
 	def train(self, inputs, epochs=10, attention=True, perceptron=True):
 		KG, dataset, T = inputs
 		train_set, test_set = train_test_split(dataset)
-		
+
 		# Hyperparameters configuration
 		self.T = T
 		self.KG = KG
@@ -93,14 +93,20 @@ class PolicyNetwork():
 		return val_acc, predictions
 
 
-	def run_train_op(self, train_set):
+	def run_train_op(self, train_set, predictions = False):
 		# Hyperparameters configuration
-		self.beam_size = 1
-		for inputs in train_set:
-			predictions, outputs = self.forward(inputs)
-			loss = self.REINFORCE_loss_function(outputs)
-			self.opt.minimize(loss)
-		return loss
+			self.beam_size = 1
+			y_hat = []
+			with tf.GradientTape() as tape:
+				for inputs in train_set:
+					predictions, outputs = self.forward(inputs)
+					loss = self.REINFORCE_loss_function(outputs)
+					self.opt.minimize(loss)
+					y_hat.append(predictions)
+
+	        acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
+	        results = (acc, y_hat) if predictions else acc
+		return results
 
 	def run_val_op(self, val_set, predictions = False):
 	        # Hyperparameters configuration
@@ -112,9 +118,10 @@ class PolicyNetwork():
 	        for inputs in val_set:
 	            predictions, outputs = self.forward(inputs)
 	            y_hat.append(y_pred)
-	        if predictions:
-	            acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
-	        return acc, y_hat
+
+	        acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
+	        results = (acc, y_hat) if predictions else acc
+	        return results
 
 
 	def forward(self, inputs):
@@ -190,7 +197,7 @@ class PolicyNetwork():
 		return prediction, [actions_onehot,action_probs,discount_r]
 
 
-	def discount_rewards(self, rewards):
+	def discount_rewards(self, rewards, normalize = False):
         discounted_r = np.zeros_like(rewards)
         running_add = 0
         for t in reversed(range(0, rewards.size)):
@@ -198,14 +205,15 @@ class PolicyNetwork():
                 running_add = 0
             running_add = running_add * self.ita_discount + rewards[t]
             discounted_r[t] = running_add
-		discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-7)
+        if normalize:
+			discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-7)
         return discounted_r
 
 
 	def REINFORCE_loss_function(self, outputs):
 		actions_onehot, action_probs, rewards = outputs
-		action_prob = K.sum(action_probs * actions_onehot, axis=1)
-		log_action_prob = K.log(action_prob)
+		action_prob = K.sum(action_probs * actions_onehot, axis=1)		#Only use reward probability for chosen actions
+		log_action_prob = K.log(action_prob)							#Log likelihood of probabilities
 		loss = - log_action_prob * rewards
 		return K.mean(loss)
 
