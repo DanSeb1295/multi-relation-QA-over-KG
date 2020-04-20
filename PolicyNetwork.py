@@ -105,7 +105,7 @@ class PolicyNetwork():
                 except:
                     print('Skipped one input tuple')
                     continue
-            acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(n)])
+            acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
             results = (acc, y_hat) if predictions else acc
         return results
 
