@@ -97,18 +97,26 @@ class PolicyNetwork():
         y_hat = []
         with tf.GradientTape() as tape:
             for inputs in tqdm(train_set):
-                try:
-                    print('checkpoint1')
-                    predictions, outputs = self.forward(inputs)
-                    print('checkpoint2')
-                    loss = self.REINFORCE_loss_function(outputs)
-                    print('checkpoint3')
-                    self.opt.minimize(loss)
-                    print('checkpoint4')
-                    y_hat.append(predictions)
-                except Exception as e:
-                    print('Skipped one input tuple', e)
-                    continue
+                print('checkpoint1')
+                predictions, outputs = self.forward(inputs)
+                print('checkpoint2')
+                loss = self.REINFORCE_loss_function(outputs)
+                print('checkpoint3')
+                self.opt.minimize(loss)
+                print('checkpoint4')
+                y_hat.append(predictions)
+                # try:
+                #     print('checkpoint1')
+                #     predictions, outputs = self.forward(inputs)
+                #     print('checkpoint2')
+                #     loss = self.REINFORCE_loss_function(outputs)
+                #     print('checkpoint3')
+                #     self.opt.minimize(loss)
+                #     print('checkpoint4')
+                #     y_hat.append(predictions)
+                # except Exception as e:
+                #     print('Skipped one input tuple', e)
+                #     continue
             acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
             results = (acc, y_hat) if predictions else acc
         return results
