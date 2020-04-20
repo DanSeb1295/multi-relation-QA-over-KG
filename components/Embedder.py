@@ -12,7 +12,7 @@ import networkx as nx
 
 class Embedder:
   def __init__(self):
-    freebase_path = "/content/gdrive/.shortcut-targets-by-id/1Xw2j9nKYPFJDLHr_pMBnRb5Hg4kcIclN/CZ 4071 Network Science Project 2/Freebase"
+    freebase_path = "/content/gdrive/.shortcut-targets-by-id/1Xw2j9nKYPFJDLHr_pMBnRb5Hg4kcIclN/CZ 4071 Network Science Project 2/Freebase/"
     glove_data_file = "{}glove.6B/glove.6B.50d.txt".format(freebase_path)
     mid_to_name_file = '{}mid2name.tsv'.format(freebase_path)
     entity2id_file = '{}knowledge_graphs/entity2id.txt'.format(freebase_path)
