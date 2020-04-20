@@ -12,13 +12,14 @@ import networkx as nx
 
 class Embedder:
   def __init__(self):
-    glove_data_file = "glove.6B/glove.6B.50d.txt"
-    mid_to_name_file = 'mid2name.tsv'
-    entity2id_file = 'knowledge_graphs/entity2id.txt'
-    relation2id_file = 'knowledge_graphs/relation2id.txt'
+    freebase_path = "../../../Freebase/"
+    glove_data_file = "{}glove.6B/glove.6B.50d.txt".format(freebase_path)
+    mid_to_name_file = '{}mid2name.tsv'.format(freebase_path)
+    entity2id_file = '{}knowledge_graphs/entity2id.txt'.format(freebase_path)
+    relation2id_file = '{}knowledge_graphs/relation2id.txt'.format(freebase_path)
     # triple2id_file = 'knowledge_graphs/triple2id.txt'
-    embedding_entity_file = 'embeddings/dimension_50/transe/entity2vec.bin'
-    embedding_relation_file = 'embeddings/dimension_50/transe/relation2vec.bin'
+    embedding_entity_file = '{}embeddings/dimension_50/transe/entity2vec.bin'.format(freebase_path)
+    embedding_relation_file = '{}embeddings/dimension_50/transe/relation2vec.bin'.format(freebase_path)
 
     print('Importing Glove Word Embeddings')
     words = pd.read_csv(glove_data_file, sep=" ", index_col=0, header=None, na_values=None, quoting=csv.QUOTE_NONE) 
