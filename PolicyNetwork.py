@@ -3,9 +3,10 @@ from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
 from util import train_test_split, save_checkpoint
 import numpy as np
 import tensorflow as tf
-from tensorflow.compat.v1.keras import backend as K
-from tensorflow.compat.v1.keras.preprocessing.sequence import pad_sequences
-from tensorflow.compat.v1.keras import utils as np_utils
+# from tensorflow.compat.v1.keras import backend as K
+from tensorflow import keras
+from keras.preprocessing.sequence import pad_sequences
+from keras import utils as np_utils
 from tqdm import tqdm
 
 
@@ -25,7 +26,7 @@ class PolicyNetwork():
 
     def load_saved_model(self, saved_model_path):
         try:
-            saver = tf.train.import_meta_graph(saved_model_path)
+            saver = tf.compat.v1.train.import_meta_graph(saved_model_path)
             saver.restore(self.sess, tf.train.latest_checkpoint('./'))
         except:
             print('Load failed. Starting with a new network.')
@@ -55,7 +56,7 @@ class PolicyNetwork():
 
         with self.sess:
             # K.set_session(self.sess)
-            self.sess.run(tf.global_variables_initializer())
+            self.sess.run(tf.compat.v1.global_variables_initializer())
 
             train_acc = []
             val_acc = []
@@ -132,7 +133,7 @@ class PolicyNetwork():
         actions_onehot = []
         
         q = [self.Embedder.embed_word(w) for w in q]
-        q = tf.convert_to_tensor(q)                         # Embedding Module
+        q = tf.convert_to_tensor(value=q)                         # Embedding Module
         n = len(q)
 
         e_t = {}        # T x 1; entity
