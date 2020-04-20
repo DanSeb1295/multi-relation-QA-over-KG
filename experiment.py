@@ -14,8 +14,8 @@ tf.random.set_seed(seed)
 epochs = 10
 
 # paths for the KG and QA files
-path_KB = r"datasets\3H-kb.txt"
-path_QA = r"datasets\PQ-3H.txt"
+path_KB = "./datasets/3H-kb.txt"
+path_QA = "./datasets/PQ-3H.txt"
 
 # Experiment Settings
 T = 2                 # To change according to QA type
