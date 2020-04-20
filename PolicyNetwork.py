@@ -3,7 +3,7 @@ from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
 from util import train_test_split, save_checkpoint
 import numpy as np
 import tensorflow as tf
-from tf import keras
+from tensorflow import keras
 from keras import backend as K
 from keras.preprocessing.sequence import pad_sequences
 from keras import utils as np_utils
