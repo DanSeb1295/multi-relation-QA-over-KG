@@ -3,7 +3,7 @@ import pandas as pd
 from math import ceil
 import numpy as np
 import tensorflow as tf
-from components import Entity_linker
+from components import EntityLinker
 
 seed = 2020
 train_split = 0.8
@@ -27,7 +27,7 @@ def prep_dataset(path_KB, path_QA):
     df_qn['answer'] = df_qn['answer_set'].apply(lambda x: x.split('(')[0])
 
     # Initialize Entity Linker
-    entity_linker = Entity_linker(path_KB, path_QA)
+    entity_linker = EntityLinker(path_KB, path_QA)
 
     # get parsed qn and the topic entity
     df_qn['q'], df_qn['e_s'] = zip(*df_qn['question_sentence'].apply(lambda x: entity_linker.find_entity(x)))
