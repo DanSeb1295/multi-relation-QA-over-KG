@@ -132,7 +132,7 @@ class PolicyNetwork():
         action_probs = []
         actions_onehot = []
         
-        q = [self.Embedder.embed_word(w) for w in q]
+        q = np.array([self.Embedder.embed_word(w) for w in q])
         q = tf.convert_to_tensor(value=q)                         # Embedding Module
         n = len(q)
 
