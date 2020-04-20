@@ -153,11 +153,11 @@ class PolicyNetwork():
         action_probs = []
         actions_onehot = []
 
-        temp_q = np.array([])
+        temp_q = np.array([[]])
         for w in q:
             embeded_word = self.Embedder.embed_word(w)
             if embeded_word.all():
-                temp_q = np.append(temp_q, embeded_word)
+                temp_q = np.append(temp_q, embeded_word, axis = 0)
         q = temp_q
 
         
