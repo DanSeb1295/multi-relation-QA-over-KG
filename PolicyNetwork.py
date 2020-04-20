@@ -154,7 +154,7 @@ class PolicyNetwork():
         actions_onehot = []
 
         q = [self.Embedder.embed_word(w) for w in q]
-        assert(None not in q) # Make sure words are all embedded
+        assert(np.all(q)) # Make sure words are all embedded
         print('>>>', q, q.shape)
         q = tf.convert_to_tensor(value=q)                         # Embedding Module
         n = len(q)
