@@ -133,6 +133,7 @@ class PolicyNetwork():
         actions_onehot = []
         
         q = np.array([self.Embedder.embed_word(w) for w in q])
+        print('>>>', q, q.shape)
         q = tf.convert_to_tensor(value=q)                         # Embedding Module
         n = len(q)
 
