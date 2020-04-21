@@ -140,8 +140,9 @@ class PolicyNetwork():
 
         q = [self.Embedder.embed_word(w) for w in q]
         assert(None not in q) # Make sure words are all embedded
-        print('>>>', q, q.shape)
+        print('>>>', q.shape)
         q = tf.convert_to_tensor(value=q)                         # Embedding Module
+        q = tf.reshape(q,[1,*q.shape])
         n = len(q)
 
         e_t = {}        # T x 1; entity
