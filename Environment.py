@@ -31,7 +31,7 @@ class Rewards():
         self.rewards_dict = rewards_dict
 
     def get_transition_reward(self, cur_state, action, next_state, ans):
-        SAS = (current_state, action, next_state)
+        SAS = (cur_state, action, next_state)
         if self.rewards_dict.get(SAS): return self.rewards_dict.get(SAS)    # Skip computation if reward has previously been computed
         
         F_phi = self.gamma * phi(next_state) - phi(cur_state)
