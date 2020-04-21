@@ -27,6 +27,7 @@ class PolicyNetwork():
         try:
             # saver = tf.compat.v1.train.import_meta_graph(saved_model_path)
             # saver.restore(self.sess, tf.train.latest_checkpoint('./'))
+            pass
         except:
             print('Load failed. Starting with a new network.')
             
