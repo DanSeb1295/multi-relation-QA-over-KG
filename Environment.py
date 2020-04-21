@@ -74,7 +74,7 @@ class Environment():
     def transit(self, action, t, q_t, H_t):
         new_state = self.get_next_state(action)
         new_state.set_memory(t+1, q_t, H_t)
-        new_reward = self.get_action_reward(self.current_state, action, new_state)
+        new_reward = self.get_action_reward(action, new_state)
         self.current_state = new_state
         return new_state, new_reward
 
@@ -101,8 +101,8 @@ class Environment():
         action_space = [(edge['relation'], neighbour) for neighbour, edge in self.knowledge_graph[self.current_state.e_t].items()]
         return action_space
 
-    def get_action_reward(self, action):
-        cur_state, next_state = self.current_state, self.get_next_state(action)
+    def get_action_reward(self, action, next_state):
+        cur_state = self.current_state
         return self.rewards_func.get_transition_reward(cur_state, action, next_state, self.ans)
 
     def get_transition_reward(self, s_0: State, action, s_1: State):
