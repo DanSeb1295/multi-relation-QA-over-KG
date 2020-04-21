@@ -303,7 +303,7 @@ class PolicyNetwork():
         # index = K.eval(index)[0]
         # index = index.eval(session=tf.compat.v1.Session())
         # index = index[0]
-        return actions[index
+        return actions[index]
 
 
     def softmax(self, vectors):
