@@ -21,9 +21,13 @@ class PolicyNetwork():
         self.opt = tf.optimizers.Adam(learning_rate = self.lr)
         self.sess = tf.compat.v1.Session()
 
-        self.initialise_models()
-        if saved_model_path:
-            self.load_saved_model(saved_model_path)
+        with self.sess:
+            K.set_session(self.sess)
+            self.sess.run(tf.compat.v1.global_variables_initializer())
+
+            self.initialise_models()
+            if saved_model_path:
+                self.load_saved_model(saved_model_path)
 
     def load_saved_model(self, saved_model_path):
         try:
@@ -55,26 +59,26 @@ class PolicyNetwork():
             self.env = Environment(KG)
 
 
-        with self.sess:
-            K.set_session(self.sess)
-            self.sess.run(tf.compat.v1.global_variables_initializer())
+        # with self.sess:
+        #     K.set_session(self.sess)
+        #     self.sess.run(tf.compat.v1.global_variables_initializer())
 
-            train_acc = []
-            val_acc = []
-            for epoch in range(epochs):
-                epoch_train_acc = self.run_train_op(train_set)
-                epoch_val_acc = self.run_val_op(test_set)
-                
-                train_acc.append(epoch_train_acc)
-                val_acc.append(epoch_val_acc)
-                
-                # save results and weights
-                with open("results.txt", "a+") as f:
-                    f.write("Iteration %s - train acc: %d, val acc: %d" % (epoch, epoch_train_acc, epoch_val_acc))
-                if epoch == 1:
-                    save_checkpoint(self, 'model', epoch,write_meta_graph=True)
-                else:
-                    save_checkpoint(self,'model',epoch)
+        train_acc = []
+        val_acc = []
+        for epoch in range(epochs):
+            epoch_train_acc = self.run_train_op(train_set)
+            epoch_val_acc = self.run_val_op(test_set)
+            
+            train_acc.append(epoch_train_acc)
+            val_acc.append(epoch_val_acc)
+            
+            # save results and weights
+            with open("results.txt", "a+") as f:
+                f.write("Iteration %s - train acc: %d, val acc: %d" % (epoch, epoch_train_acc, epoch_val_acc))
+            if epoch == 1:
+                save_checkpoint(self, 'model', epoch,write_meta_graph=True)
+            else:
+                save_checkpoint(self,'model',epoch)
 
         return train_acc, val_acc
 
