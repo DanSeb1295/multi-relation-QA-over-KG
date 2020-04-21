@@ -295,8 +295,8 @@ class PolicyNetwork():
         rescaled_probas = tf.expand_dims(K.log(probabilities), 0)  # shape [1, action_space]
 
         # Draw one example from the distribution (we could draw more)
-        index = tf.multinomial(rescaled_probas, num_samples=1)
-        index = tf.squeeze(index, [0]).eval()[0]
+        index = tf.compat.v1.multinomial(rescaled_probas, num_samples=1)
+        index = np.asarray(tf.squeeze(index, [0]))[0]
         return actions[sampled_index]
 
 
