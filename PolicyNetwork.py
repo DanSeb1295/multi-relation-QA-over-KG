@@ -165,7 +165,7 @@ class PolicyNetwork(tf.keras.Model):
         temp_q = np.empty((0, 50)).astype(np.float32)
         for w in q:
             embeded_word = self.model.Embedder.embed_word(w)
-            if embeded_word and embeded_word.all():
+            if embeded_word is not None and embeded_word.all():
                 temp_q = np.append(temp_q, embeded_word.reshape((1,50)), axis = 0)
         q = temp_q
         
@@ -272,7 +272,7 @@ class PolicyNetwork(tf.keras.Model):
             for action in action_space:
                 # Attention Layer: Generate Similarity Scores between q and r and current point of attention
                 r_star = self.Embedder.embed_relation(action[0])
-                if r_star and r_star.all():
+                if r_star is not None and r_star.all():
                     r_star = tf.Variable(r_star)
                     q_t_star[t] = self.attention(r_star, q_t[t])
 
