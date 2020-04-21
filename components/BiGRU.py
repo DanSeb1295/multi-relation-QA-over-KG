@@ -13,6 +13,7 @@ class BiGRU():
         self.bw_2 = keras.layers.GRU(HIDDEN_DIM, go_backwards=True, dropout=dropout, recurrent_dropout=dropout)
 
     def compute(self, q):
+        print(q)
         fw_out_1 = self.fw_1(q)
         bw_out_1 = self.bw_1(q)
         hidden_out = tf.concat([fw_out_1, bw_out_1], 0)
