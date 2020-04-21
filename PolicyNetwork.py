@@ -183,9 +183,10 @@ class PolicyNetwork(tf.keras.Model):
         # r_t[0] = np.zeros(d).astype(np.float32)
         # H_t[1] = self.gru(r_t[0])                 # History Encoder Module
         
+        r_0 = np.zeros(d).astype(np.float32)
         q_vector = self.bigru(q)                   # BiGRU Module
         self.env.start_new_query(State(q, e_s, e_s, set()), ans)
-        prediction, outputs = self.model(q_vector, self.gru(r_t[0]))
+        prediction, outputs = self.model(q_vector, self.gru(r_0))
         return predictions, outputs
         
         # for t in range(1, T+1):
