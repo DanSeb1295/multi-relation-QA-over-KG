@@ -14,12 +14,13 @@ class Perceptron():
 
         r_star = tf.reshape(r_star, [d])
 
-        input = tf.concat(H_t, q_t_star, axis = 0)
+        input = tf.reshape(tf.concat(H_t, q_t_star, 0), [2*d, 1])
         
-        logits_1 = tf.matmul(self.W_L1, input)
+        logits_1 = tf.reshape(tf.matmul(self.W_L1, input), [d])
         out_1 = tf.nn.relu(logits_1)
-        out_2 = tf.matmul(self.W_L2, out_1)
-        semantic_score = tf.matmul(r_star, logits_2)
+        out_2 = tf.math.multiply(self.W_L2, out_1)
+        semantic_score = tf.math.multiply(r_star, out_2)
+        semantic_score = tf.reduce_sum(semantic_score, 0)
 
         return semantic_score
 
