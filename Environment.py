@@ -91,7 +91,7 @@ class Environment():
         for neighbour, edge in self.knowledge_graph[self.current_state.e_t].items():
             if edge['relation'] == action[0]:
                 new_state = State(self.current_state.q, self.current_state.e_s, neighbour, set(self.current_state.h_t) | {action})
-            break
+                break
         
         return new_state
 
