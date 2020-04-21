@@ -11,6 +11,8 @@ from tqdm import tqdm
 
 class PolicyNetwork():
     def __init__(self, T, saved_model_path: str = ''):
+        tf.compat.v1.disable_v2_behavior()
+        
         self.T = T
         self.env = None
         self.beam_size = 1
@@ -54,8 +56,6 @@ class PolicyNetwork():
 
 
         with self.sess:
-            tf.compat.v1.disable_v2_behavior()
-            tf.compat.v1.disable_eager_execution()
             K.set_session(self.sess)
             self.sess.run(tf.compat.v1.global_variables_initializer())
 
