@@ -47,7 +47,6 @@ class PolicyNetwork():
         train_set, test_set = train_test_split(dataset)
 
         # Hyperparameters configuration
-        self.beam_size = 1
         self.T = T
         self.KG = KG
         self.use_attention = attention
@@ -55,24 +54,7 @@ class PolicyNetwork():
         if not self.env:
             self.env = Environment(KG)
 
-        # Create the model
-        x = tf.compat.v1.placeholder(tf.float32, [len(train_set)])
-        y_ = tf.compat.v1.placeholder([len(train_set)])
-        predictions_outputs = tf.map_fn(lambda inputs: self.forward(inputs), train_set)
-        predictions, outputs = tf.unstack(predictions_outputs, axis=1)
 
-        # Optimisers
-        loss = self.REINFORCE_loss_function(outputs)
-        train_opt = self.opt.minimize(loss)
-
-        # Accuracy
-        correct_prediction = tf.cast(tf.equal(predictions, y_), tf.float32)
-        accuracy = tf.reduce_mean(correct_prediction)
-
-        acc = K.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
-        results = (acc, y_hat) if predictions else acc
-
-        # training
         with self.sess:
             K.set_session(self.sess)
             self.sess.run(tf.compat.v1.global_variables_initializer())
@@ -80,13 +62,10 @@ class PolicyNetwork():
             train_acc = []
             val_acc = []
             for epoch in range(epochs):
-                _, batch_loss_, epoch_train_acc = sess.run([train_opt, loss, accuracy], {x: train_set, y_: [data[2] for data in train_set]})
-                train_acc.append(epoch_train_acc)
+                epoch_train_acc = self.run_train_op(train_set)
+                epoch_val_acc = self.run_val_op(test_set)
                 
-                # epoch_train_acc = self.run_train_op(train_set)
-                # epoch_val_acc = self.run_val_op(test_set)
-
-                epoch_val_acc = accuracy.eval(feed_dict={x: test_set, y_: [data[2] for data in train_set]})
+                train_acc.append(epoch_train_acc)
                 val_acc.append(epoch_val_acc)
                 
                 # save results and weights
@@ -115,15 +94,18 @@ class PolicyNetwork():
 
     def run_train_op(self, train_set, predictions = False):
         # Hyperparameters configuration
-        # y_hat = []
+        self.beam_size = 1
+        y_hat = []
         # with tf.GradientTape() as tape:
-        
-            # prediction, output = self.forward(inputs)
-            # loss = self.REINFORCE_loss_function(outputs)
-            # print('checkpoint3')
-            # self.opt.minimize(loss)
-            # print('checkpoint4')
-            # y_hat.append(predictions)
+        for inputs in tqdm(train_set):
+            print('checkpoint1')
+            predictions, outputs = self.forward(inputs)
+            print('checkpoint2')
+            loss = self.REINFORCE_loss_function(outputs)
+            print('checkpoint3')
+            self.opt.minimize(loss)
+            print('checkpoint4')
+            y_hat.append(predictions)
             # try:
             #     print('checkpoint1')
             #     predictions, outputs = self.forward(inputs)
@@ -136,11 +118,9 @@ class PolicyNetwork():
             # except Exception as e:
             #     print('Skipped one input tuple', e)
             #     continue
-        # acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
-        # results = (acc, y_hat) if predictions else acc
-        # return results
-        # return predictions, outputs
-        pass
+        acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
+        results = (acc, y_hat) if predictions else acc
+        return results
 
 
 
@@ -318,10 +298,11 @@ class PolicyNetwork():
         # Draw one example from the distribution (we could draw more)
         index = tf.compat.v1.multinomial(rescaled_probas, num_samples=1)
         index = tf.squeeze(index, [0])[0]
+        
         for i in range(len(actions)):
           if tf.constant(i, dtype=tf.int64) == index:
             index = i
-
+        
         return actions[index]
 
 
