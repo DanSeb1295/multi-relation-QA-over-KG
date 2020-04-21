@@ -45,10 +45,10 @@ class Rewards():
 
         if t == 1: return 0
         
-        H_t = state_memory.get('H_t')
-        q_t = state_memory.get('q_t')
+        H_t = state_memory.get('H_t').get(t, [])
+        q_t = state_memory.get('q_t').get(t, [])
         Q_t = tf.zeros(d)
-        n = len(q_t.get(t, []))
+        n = len(q_t)
         for i in range(1, t):
             for j in range(n):
                 Q_t += q_t[i][j]
