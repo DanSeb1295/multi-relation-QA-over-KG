@@ -292,18 +292,17 @@ class PolicyNetwork():
 
         
     def sample_action(self, actions, probabilities):
-        tf.compat.v1.enable_eager_execution()
         # Convert probabilities to log_probabilities and reshape it to [1, action_space]
         rescaled_probas = tf.expand_dims(K.log(probabilities), 0)  # shape [1, action_space]
 
         # Draw one example from the distribution (we could draw more)
         index = tf.compat.v1.multinomial(rescaled_probas, num_samples=1)
-        index = tf.squeeze(index, [0]).numpy()[0]
-        
+        index = tf.squeeze(index, [0])
+        index = K.get_value(x)[0]
+
         # index = K.eval(index)[0]
         # index = index.eval(session=tf.compat.v1.Session())
         # index = index[0]
-        tf.compat.v1.disable_v2_behavior()
         return actions[index]
 
 
