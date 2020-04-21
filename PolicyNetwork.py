@@ -56,8 +56,8 @@ class PolicyNetwork():
             self.env = Environment(KG)
 
         # Create the model
-        x = tf.placeholder(tf.float32, [len(train_set)])
-        y_ = tf.placeholder([len(train_set)])
+        x = tf.compat.v1.placeholder(tf.float32, [len(train_set)])
+        y_ = tf.compat.v1.placeholder([len(train_set)])
         predictions_outputs = tf.map_fn(lambda inputs: self.forward(inputs), train_set)
         predictions, outputs = tf.unstack(predictions_outputs, axis=1)
 
