@@ -14,7 +14,7 @@ class Perceptron():
 
         r_star = tf.reshape(r_star, [d])
 
-        input = tf.reshape(tf.concat(H_t, q_t_star, 0), [2*d, 1])
+        input = tf.reshape(tf.concat([H_t, q_t_star], 0), [2*d, 1])
         
         logits_1 = tf.reshape(tf.matmul(self.W_L1, input), [d])
         out_1 = tf.nn.relu(logits_1)
