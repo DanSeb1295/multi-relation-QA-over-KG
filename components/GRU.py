@@ -2,7 +2,6 @@ import tensorflow as tf
 from Environment import d
 
 dropout = 0.3
-KEEP_PROB = 1 - dropout
 
 class GRU():
     def __init__(self):
@@ -28,7 +27,8 @@ class GRU():
         # self.states = (state_1, state_2, state_3)
 
         r_t = tf.expand_dims(r_t, 0)
+        r_t = tf.expand_dims(r_t, 0)
         H_t_1 = self.GRU(r_t)
-        H_t_1 = tf.reshape([d])
+        H_t_1 = tf.reshape(H_t_1, [d])
 
         return H_t_1
