@@ -52,7 +52,7 @@ class PolicyNetwork(tf.keras.Model):
         if not self.env:
             self.env = Environment(KG)
 
-        self.model = PolicyNetwork()
+        self.model = PolicyNetwork(self.T)
 
         # with self.sess:
         #     K.set_session(self.sess)
