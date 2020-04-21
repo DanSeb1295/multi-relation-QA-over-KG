@@ -6,7 +6,7 @@ initializer = tf.keras.initializers.GlorotNormal()
 class Attention():
     def __init__(self):
         self.W = tf.Variable(initializer([d]))
-        self.B = tf.Variable(0)
+        self.b = tf.Variable(0, dtype=tf.float32)
 
     def compute(self, r_star, q_t):
         if r_star.shape == (d, 1):
