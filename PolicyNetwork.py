@@ -181,10 +181,10 @@ class PolicyNetwork():
         r_t[0] = np.zeros(d).astype(np.float32)
         
         self.env.start_new_query(S_t[1], ans)
+        H_t[t] = self.gru(r_t[t-1])                 # History Encoder Module
         
         for t in range(1, T+1):
             q_t[t] = self.slp(q_vector, t)             # Single-Layer Perceptron Module
-            H_t[t] = self.gru(r_t[t-1])     # History Encoder Module
             possible_actions = self.env.get_possible_actions()
             action_space = self.beam_search(possible_actions)
 
@@ -207,6 +207,8 @@ class PolicyNetwork():
             print(action_distribution)
             action = self.sample_action(action_space, action_distribution)
             a_t[t] = action
+            r_t[t] = action(0)
+            H_t[t+1] = self.gru(r_t[t])
 
             # Take action, advance state, and get reward
             # q_t & H_t passed in order to generate the new State object within Environment
