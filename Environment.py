@@ -34,8 +34,6 @@ class Rewards():
         SAS = (cur_state, action, next_state)
         if self.rewards_dict.get(SAS): return self.rewards_dict.get(SAS)    # Skip computation if reward has previously been computed
         
-        print('gamma', self.gamma)
-        print('next', self.phi(next_state))
         F_phi = self.gamma * self.phi(next_state) - self.phi(cur_state)
         R = 1 if next_state.e_t == ans else 0
         reward = R + F_phi
@@ -61,7 +59,7 @@ class Rewards():
             cos_sim = 0
         else:
             cos_sim = np.dot(Q_t, H_t) / norm_product
-
+        print('HERE', max(cos_sim, 0))
         return max(cos_sim, 0)
 
 
