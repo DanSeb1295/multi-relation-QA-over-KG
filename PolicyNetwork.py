@@ -207,7 +207,7 @@ class PolicyNetwork():
             print(action_distribution)
             action = self.sample_action(action_space, action_distribution)
             a_t[t] = action
-            r_t[t] = action(0)
+            r_t[t] = self.Embedder.embed_relation(action[0])
             H_t[t+1] = self.gru(r_t[t])
 
             # Take action, advance state, and get reward
