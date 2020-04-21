@@ -54,7 +54,7 @@ class PolicyNetwork():
 
 
         with self.sess:
-            tf.disable_v2_behavior()
+            tf.compat.v1.disable_v2_behavior()
             K.set_session(self.sess)
             self.sess.run(tf.compat.v1.global_variables_initializer())
 
