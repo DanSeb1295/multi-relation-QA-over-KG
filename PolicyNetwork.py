@@ -188,7 +188,7 @@ class PolicyNetwork(tf.keras.Model):
         q_vector = self.model.bigru(q)                   # BiGRU Module
         self.model.env.start_new_query(State(q, e_s, e_s, set()), ans)
         prediction, outputs = self.model(q_vector, self.model.gru(r_0))
-        return predictions, outputs
+        return prediction, outputs
         
         # for t in range(1, T+1):
         #     q_t[t] = self.slp(q_vector, t)             # Single-Layer Perceptron Module
