@@ -205,7 +205,7 @@ class PolicyNetwork():
             # Softmax Module: Leading to selection of action according to policy
             action_distribution = tf.nn.softmax(semantic_scores)
             action = self.sample_action(action_space, action_distribution)
-            
+
             a_t[t] = action
             r_t[t] = self.Embedder.embed_relation(action[0])
             H_t[t+1] = self.gru(r_t[t])
@@ -220,7 +220,7 @@ class PolicyNetwork():
             #TODO: Implement discount factor
             rewards.append(new_reward)
             action_probs.append(action_distribution)
-            actions_onehot.append(np_utils.to_categorical(action, num_classes=len(action_distribution)))
+            actions_onehot.append(np_utils.to_categorical(np.arange(len(action_space)), num_classes=len(action_space)))
 
         prediction = S_t[-1].e_t
         discount_r = self.discount_rewards(rewards)
