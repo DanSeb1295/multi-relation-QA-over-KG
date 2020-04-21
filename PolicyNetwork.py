@@ -19,7 +19,7 @@ class PolicyNetwork(tf.keras.Model):
         self.opt = tf.keras.optimizers.Adam(learning_rate = self.lr)
         # self.sess = tf.compat.v1.Session()
 
-        self.initialise_models()
+        # self.initialise_models()
         if saved_model_path:
             self.load_saved_model(saved_model_path)
 
@@ -58,6 +58,7 @@ class PolicyNetwork(tf.keras.Model):
             self.env = Environment(KG)
 
         self.model = PolicyNetwork(self.T, env=self.env)
+        self.model.initialise_models()
 
         # with self.sess:
         #     K.set_session(self.sess)
@@ -163,7 +164,7 @@ class PolicyNetwork(tf.keras.Model):
 
         temp_q = np.empty((0, 50)).astype(np.float32)
         for w in q:
-            embeded_word = self.Embedder.embed_word(w)
+            embeded_word = self.model.Embedder.embed_word(w)
             if embeded_word.all():
                 temp_q = np.append(temp_q, embeded_word.reshape((1,50)), axis = 0)
         q = temp_q
