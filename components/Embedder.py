@@ -117,7 +117,7 @@ class Embedder:
   def embed_relation(self, relation): 
     try:
       index = int(self.relation2id[relation])
-      print(index)
+      # print('Relation Index: ', index)
       vector_index = index * 50
       return self.relation_embedding[vector_index:vector_index+50]
     except Exception as e:
