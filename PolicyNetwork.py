@@ -8,7 +8,7 @@ from keras.preprocessing.sequence import pad_sequences
 from keras import utils as np_utils
 from tqdm import tqdm
 
-class PolicyNetwork(tensorflow.keras.Model):
+class PolicyNetwork(tf.keras.Model):
     def __init__(self, T, saved_model_path: str = ''):
         self.T = T
         self.env = None
