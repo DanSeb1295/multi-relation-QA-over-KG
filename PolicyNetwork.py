@@ -181,7 +181,7 @@ class PolicyNetwork():
         r_t[0] = np.zeros(d).astype(np.float32)
         
         self.env.start_new_query(S_t[1], ans)
-        H_t[t] = self.gru(r_t[t-1])                 # History Encoder Module
+        H_t[1] = self.gru(r_t[0])                 # History Encoder Module
         
         for t in range(1, T+1):
             q_t[t] = self.slp(q_vector, t)             # Single-Layer Perceptron Module
