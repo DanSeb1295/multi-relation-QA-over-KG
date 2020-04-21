@@ -11,9 +11,6 @@ from tqdm import tqdm
 
 class PolicyNetwork():
     def __init__(self, T, saved_model_path: str = ''):
-        # tf.compat.v1.disable_v2_behavior()
-        tf.compat.v1.enable_eager_execution()
-        
         self.T = T
         self.env = None
         self.beam_size = 1
@@ -291,22 +288,12 @@ class PolicyNetwork():
 
         return beamed_actions
 
-        
     def sample_action(self, actions, probabilities):
         # Convert probabilities to log_probabilities and reshape it to [1, action_space]
         rescaled_probas = tf.expand_dims(K.log(probabilities), 0)  # shape [1, action_space]
 
         # Draw one example from the distribution (we could draw more)
         index = tf.compat.v1.multinomial(rescaled_probas, num_samples=1)
-        index = tf.squeeze(index, [0])[0]
-        
-        # print('>>>>', self.sess.run(index))
-        for i in range(len(actions)):
-          if tf.constant(i, dtype=tf.int64) == index:
-            index = i
+        index = tf.squeeze(index, [0]).nupmy()[0]
         
         return actions[index]
-
-
-    def softmax(self, vectors):
-        return np.exp(vectors) / np.sum(np.exp(vectors))
