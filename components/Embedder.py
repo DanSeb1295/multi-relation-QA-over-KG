@@ -32,7 +32,7 @@ class Embedder:
     print('done')
     self.word_embeddings = words
     print('Getting Mid to Name')
-    self.mid_to_name = self.read_tsv(mid_to_name_file)
+    # self.mid_to_name = self.read_tsv(mid_to_name_file)
     print('Done')
     print('Getting entity2id')
     # self.entity2id = self.read_tsv(entity2id_file)
