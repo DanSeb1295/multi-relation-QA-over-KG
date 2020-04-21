@@ -8,14 +8,14 @@ from keras.preprocessing.sequence import pad_sequences
 from keras import utils as np_utils
 from tqdm import tqdm
 
-class PolicyNetwork():
+class PolicyNetwork(tensorflow.keras.Model):
     def __init__(self, T, saved_model_path: str = ''):
         self.T = T
         self.env = None
         self.beam_size = 1
         self.lr = 1e-3
         self.ita_discount = 0.9
-        self.opt = tf.optimizers.Adam(learning_rate = self.lr)
+        self.opt = tf.keras.optimizers.Adam(learning_rate = self.lr)
         # self.sess = tf.compat.v1.Session()
 
         self.initialise_models()
@@ -52,20 +52,24 @@ class PolicyNetwork():
         if not self.env:
             self.env = Environment(KG)
 
+        self.model = PolicyNetwork()
 
         # with self.sess:
         #     K.set_session(self.sess)
         #     self.sess.run(tf.compat.v1.global_variables_initializer())
 
         train_acc = []
+        train_losses = []
         val_acc = []
+        val_losses = []
         for epoch in range(epochs):
-            epoch_train_acc = self.run_train_op(train_set)
-            epoch_val_acc = self.run_val_op(test_set)
+            train_acc, train_loss = self.run_train_op(train_set)
+            val_acc, val_loss = self.run_val_op(test_set)
             
-            train_acc.append(epoch_train_acc)
+            train_acc.append(train_acc)
+            train_losses.append(train_loss)
             val_acc.append(epoch_val_acc)
-            
+            train_losses.append(val_loss)
             # save results and weights
             # with open("results.txt", "a+") as f:
             #     f.write("Iteration %s - train acc: %d, val acc: %d" % (epoch, epoch_train_acc, epoch_val_acc))
@@ -74,7 +78,7 @@ class PolicyNetwork():
             # else:
             #     save_checkpoint(self,'model',epoch)
 
-        return train_acc, val_acc
+        return (train_acc, train_losses), (val_acc, val_losses)
 
     def predict(self, inputs, attention=True, perceptron=True):
         KG, dataset, T = inputs
@@ -94,48 +98,55 @@ class PolicyNetwork():
         # Hyperparameters configuration
         self.beam_size = 1
         y_hat = []
-        # with tf.GradientTape() as tape:
-        for inputs in tqdm(train_set):
-            predictions, outputs = self.forward(inputs)
-            loss = self.REINFORCE_loss_function(outputs)
-            self.opt.minimize(loss)
-            y_hat.append(predictions)
-            # try:
-            #     print('checkpoint1')
-            #     predictions, outputs = self.forward(inputs)
-            #     print('checkpoint2')
-            #     loss = self.REINFORCE_loss_function(outputs)
-            #     print('checkpoint3')
-            #     self.opt.minimize(loss)
-            #     print('checkpoint4')
-            #     y_hat.append(predictions)
-            # except Exception as e:
-            #     print('Skipped one input tuple', e)
-            #     continue
+        losses = []
+        with tf.GradientTape() as tape:
+            for inputs in tqdm(train_set):
+                prediction, outputs = self.model(inputs)
+                loss = self.REINFORCE_loss_function(outputs)
+                gradients = tape.gradient(loss, self.model.trainable_variables)
+                self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
+                y_hat.append(prediction)
+                losses.append(loss)
+                # self.opt.minimize(loss)
+        # try:
+        #     print('checkpoint1')
+        #     predictions, outputs = self.forward(inputs)
+        #     print('checkpoint2')
+        #     loss = self.REINFORCE_loss_function(outputs)
+        #     print('checkpoint3')
+        #     self.opt.minimize(loss)
+        #     print('checkpoint4')
+        #     y_hat.append(predictions)
+        # except Exception as e:
+        #     print('Skipped one input tuple', e)
+        #     continue
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
-        results = (acc, y_hat) if predictions else acc
+        loss = np.mean(losses)
+        results = (acc, loss)
         return results
 
-
+    def call(self, inputs):
+        return self.forward(inputs)
 
     def run_val_op(self, val_set, predictions = False):
         # Hyperparameters configuration
         self.beam_size = 32
-        T = self.T
         y_hat = []
+        losses = []
 
         for inputs in tqdm(val_set):
             try:
-                print('checkpoint5')
-                predictions, outputs = self.forward(inputs)
-                print('checkpoint6')
-                y_hat.append(y_pred)
+                prediction, outputs = self.model(inputs)
+                loss = self.REINFORCE_loss_function(outputs)
+                y_hat.append(prediction)
+                losses.append(loss)
             except Exception as e:
                 print('Skipped one input tuple', e)
                 continue
 
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
-        results = (acc, y_hat) if predictions else acc
+        loss = np.mean(losses)
+        results = (acc, loss)
         return results
 
 

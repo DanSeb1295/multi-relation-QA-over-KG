@@ -31,13 +31,13 @@ saved_model_path = 'model.meta'
 policy_network = PolicyNetwork(T, saved_model_path)
 
 # Run Experiments
-train_acc_att_per, val_acc_att_per = policy_network.train(inputs, epochs=epochs)                # Model uses both attention & perceptro layers
-train_acc_per, val_acc_per = policy_network.train(inputs, epochs=epochs, attention=False)         # Model does not use attention layer
-train_acc_att, val_acc_att = policy_network.train(inputs, epochs=epochs, perceptron=False)        # Model does not use perceptron layer
+train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)                # Model uses both attention & perceptro layers
+train_per, val_per = policy_network.train(inputs, epochs=epochs, attention=False)         # Model does not use attention layer
+train_att, val_att = policy_network.train(inputs, epochs=epochs, perceptron=False)        # Model does not use perceptron layer
 
 # TODO: Plot Results
-print(pd.DataFrame({'SRN': [np.mean(val_acc_att_per)], 'w/o Attention': [np.mean(val_acc_per)],
-                    'w/o Perceptron': [np.mean(val_acc_att)]}, index=["PQ-2H"]).T)
+print(pd.DataFrame({'SRN': [np.mean(val_att_per[0])], 'w/o Attention': [np.mean(val_per[0])],
+                    'w/o Perceptron': [np.mean(val_att[0])]}, index=["PQ-2H"]).T)
 
 # # plot epochs vs acc
 # xaxis = range(len(epochs))
@@ -48,9 +48,9 @@ print(pd.DataFrame({'SRN': [np.mean(val_acc_att_per)], 'w/o Attention': [np.mean
 # plt.title("Ablation Study of PQ-2H")
 # plt.xlabel('Epochs')
 # plt.ylabel('Validation Set Hits@1')
-# plt.plot(xaxis, val_acc_att_per, 'r', label='SRN')
-# plt.plot(xaxis, val_acc_per, 'b', label='no Attention layer')
-# plt.plot(xaxis, val_acc_att, 'g', label='no Perceptron layer')
+# plt.plot(xaxis, val_att_per, 'r', label='SRN')
+# plt.plot(xaxis, val_per, 'b', label='no Attention layer')
+# plt.plot(xaxis, val_att, 'g', label='no Perceptron layer')
 # axes = plt.gca()
 # axes.set_ylim([ymin, ymax])
 

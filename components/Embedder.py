@@ -29,24 +29,24 @@ class Embedder:
     #     word = values[0]
     #     vector = np.asarray(values[1:], "float32")
     #     embeddings_dict[word] = vector
-    print('done')
+    # print('done')
     self.word_embeddings = words
-    print('Getting Mid to Name')
+    # print('Getting Mid to Name')
     # self.mid_to_name = self.read_tsv(mid_to_name_file)
-    print('Done')
-    print('Getting entity2id')
+    # print('Done')
+    # print('Getting entity2id')
     # self.entity2id = self.read_tsv(entity2id_file)
-    print('Done')
+    # print('Done')
     print('Getting relation2id')
     self.relation2id = self.read_tsv(relation2id_file)
     print(self.relation2id)
-    print('Done')
+    # print('Done')
     print('Getting entity Embeddings')
     self.entity_embedding = np.memmap(embedding_entity_file , dtype='float32', mode='r')
-    print('Done')
+    # print('Done')
     print('Getting relation Embeddings')
     self.relation_embedding = np.memmap(embedding_relation_file , dtype='float32', mode='r')
-    print('Done')
+    # print('Done')
 
   #one function to handle all the file reading
   def read_tsv(self, path_name):
