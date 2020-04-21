@@ -233,7 +233,7 @@ class PolicyNetwork():
     def discount_rewards(self, rewards, normalize = False):
         discounted_r = np.zeros_like(rewards).astype(np.float32)
         running_add = 0
-        for t in reversed(range(0, rewards.size)):
+        for t in reversed(range(0, len(rewards))):
             if rewards[t] != 0:
                 running_add = 0
             running_add = running_add * self.ita_discount + rewards[t]
