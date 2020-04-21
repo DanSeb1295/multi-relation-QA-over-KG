@@ -27,8 +27,8 @@ KG, dataset = prep_dataset(path_KB, path_QA)
 inputs = (KG, dataset, T)
 
 # Initialise Policy Network
-saved_model_path = 'model.meta'
-policy_network = PolicyNetwork(T, saved_model_path)
+saved_model_name = 'model'
+policy_network = PolicyNetwork(T, saved_model_name)
 
 # Run Experiments
 train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)                # Model uses both attention & perceptro layers
@@ -39,20 +39,20 @@ train_att, val_att = policy_network.train(inputs, epochs=epochs, perceptron=Fals
 print(pd.DataFrame({'SRN': [np.mean(val_att_per[0])], 'w/o Attention': [np.mean(val_per[0])],
                     'w/o Perceptron': [np.mean(val_att[0])]}, index=["PQ-3H"]).T)
 
-# # plot epochs vs acc
-# xaxis = range(len(epochs))
-# ymin = 0
-# ymax = 1
-# fig = plt.figure()
+# plot epochs vs acc
+xaxis = range(len(epochs))
+ymin = 0
+ymax = 1
+fig = plt.figure()
 
-# plt.title("Ablation Study of PQ-2H")
-# plt.xlabel('Epochs')
-# plt.ylabel('Validation Set Hits@1')
-# plt.plot(xaxis, val_att_per[0], 'r', label='SRN')
-# plt.plot(xaxis, val_per[0], 'b', label='no Attention layer')
-# plt.plot(xaxis, val_att[0], 'g', label='no Perceptron layer')
-# axes = plt.gca()
-# axes.set_ylim([ymin, ymax])
+plt.title("Ablation Study of PQ-2H")
+plt.xlabel('Epochs')
+plt.ylabel('Validation Set Hits@1')
+plt.plot(xaxis, val_att_per[0], 'r', label='SRN')
+plt.plot(xaxis, val_per[0], 'b', label='no Attention layer')
+plt.plot(xaxis, val_att[0], 'g', label='no Perceptron layer')
+axes = plt.gca()
+axes.set_ylim([ymin, ymax])
 
-# plt.legend()
-# plt.show()
+plt.legend()
+plt.show()

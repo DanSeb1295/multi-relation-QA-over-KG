@@ -9,7 +9,7 @@ from keras import utils as np_utils
 from tqdm import tqdm
 
 class PolicyNetwork(tf.keras.Model):
-    def __init__(self, T, saved_model_path: str = '', env: Environment = None):
+    def __init__(self, T, saved_model_name: str = '', env: Environment = None):
         super(PolicyNetwork, self).__init__()
         self.T = T
         self.env = env
@@ -17,22 +17,19 @@ class PolicyNetwork(tf.keras.Model):
         self.lr = 1e-3
         self.ita_discount = 0.9
         self.opt = tf.keras.optimizers.Adam(learning_rate = self.lr)
+        self.save_model_dir = './saved_models/'
 
-        # self.initialise_models()
-        if saved_model_path:
-            self.load_saved_model(saved_model_path)
+        if saved_model_name:
+            self.load_saved_model(saved_model_name)
 
     def call(self, q_vector, H_t):
         return self.sub_forward(q_vector, H_t)
 
-
     def load_saved_model(self, saved_model_path):
         try:
-            # saver = tf.compat.v1.train.import_meta_graph(saved_model_path)
-            # saver.restore(self.sess, tf.train.latest_checkpoint('./'))
-            pass
+            self.model = tf.saved_model.load(self.save_model_dir + saved_model_name)
         except:
-            print('Load failed. Starting with a new network.')
+            print('Load failed. Initialise new network.')
             
 
     def initialise_models(self):
@@ -51,19 +48,23 @@ class PolicyNetwork(tf.keras.Model):
         # Hyperparameters configuration
         self.T = T
         self.KG = KG
-        self.use_attention = attention
-        self.use_perceptron = perceptron
+        
         if not self.env:
             self.env = Environment(KG)
 
-        self.model = PolicyNetwork(self.T, env=self.env)
-        self.model.initialise_models()
+        if not self.model:
+            self.model = PolicyNetwork(self.T, env=self.env)
+            self.model.initialise_models()
+
+        self.model.use_attention = attention
+        self.model.use_perceptron = perceptron
 
         train_acc = []
         train_losses = []
         val_acc = []
         val_losses = []
-        for epoch in range(epochs):
+        for i, epoch in enumerate(range(epochs)):
+            print(">>>>>>>>>>>> EPOCH: ", i + 1, " / ", epochs)
             train_accuracy, train_loss = self.run_train_op(train_set)
             val_accuracy, val_loss = self.run_val_op(test_set)
             
@@ -71,13 +72,14 @@ class PolicyNetwork(tf.keras.Model):
             train_losses.append(train_loss)
             val_acc.append(val_accuracy)
             train_losses.append(val_loss)
-            # save results and weights
-            # with open("results.txt", "a+") as f:
-            #     f.write("Iteration %s - train acc: %d, val acc: %d" % (epoch, epoch_train_acc, epoch_val_acc))
-            # if epoch == 1:
-            #     save_checkpoint(self, 'model', epoch,write_meta_graph=True)
-            # else:
-            #     save_checkpoint(self,'model',epoch)
+            
+            # Save Model
+            model_name = 'model'
+            if attention: model_name += '_att'
+            if perceptron: model_name += '_per'
+            model_name += str(i + 1)
+            
+            tf.saved_model.save(self.model, self.save_model_dir + model_name)
 
         return (train_acc, train_losses), (val_acc, val_losses)
 
@@ -87,10 +89,16 @@ class PolicyNetwork(tf.keras.Model):
         # Hyperparameters configuration
         self.T = T
         self.KG = KG
-        self.use_attention = attention
-        self.use_perceptron = perceptron
+        
         if not self.env:
             self.env = Environment(KG)
+
+        if not self.model:
+            self.model = PolicyNetwork(self.T, env=self.env)
+            self.model.initialise_models()
+
+        self.model.use_attention = attention
+        self.model.use_perceptron = perceptron
 
         val_acc, predictions = self.run_val_op(dataset, predictions = True)
         return val_acc, predictions
@@ -264,10 +272,20 @@ class PolicyNetwork(tf.keras.Model):
                 r_star = self.Embedder.embed_relation(action[0])
                 if r_star is not None and r_star.all():
                     r_star = tf.Variable(r_star)
-                    q_t_star[t] = self.attention(r_star, q_t[t])
+
+                    if self.use_attention:
+                        q_t_star[t] = self.attention(r_star, q_t[t])
+                    else:
+                        q_t_star[t] = tf.reduce_sum(q_t[t], 1)
 
                     # Perceptron Module: Generate Semantic Score for action given q
-                    score = self.perceptron(r_star, H_t[t], q_t_star[t])
+                    if self.use_perceptron:
+                        score = self.perceptron(r_star, H_t[t], q_t_star[t])
+                    else:
+                        r_star = tf.nn.l2_normalize(r_star, 0)
+                        temp_q_t_star = tf.nn.l2_normalize(q_t_star[t], 0)
+                        score = tf.reduce_sum(tf.math.multiply(r_star, temp_q_t_star))
+
                     semantic_scores.append(score)
                 else:
                     continue
