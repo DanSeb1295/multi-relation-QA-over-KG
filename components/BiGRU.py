@@ -23,7 +23,7 @@ class BiGRU():
         fw_out_2 = self.fw_2(hidden_out)
         bw_out_2 = self.bw_2(hidden_out)
         output = tf.concat([fw_out_2, bw_out_2], 1)
-        output = tf.reshape(output, (1, n, d))
+        output = tf.reshape(output, (n, d))
 
         return output
 
