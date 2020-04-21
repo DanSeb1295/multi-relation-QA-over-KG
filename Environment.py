@@ -43,7 +43,6 @@ class Rewards():
     def phi(self, state):
         state_memory = state.get_memory()
         t = state_memory.get('t')
-        
         if t == 1: return 0
         
         H_t = state_memory.get('H_t')
