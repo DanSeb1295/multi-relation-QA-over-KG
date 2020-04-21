@@ -52,7 +52,7 @@ class PolicyNetwork(tf.keras.Model):
         if not self.env:
             self.env = Environment(KG)
 
-        if not self.model:
+        if not hasattr(self, 'model'):
             self.model = PolicyNetwork(self.T, env=self.env)
             self.model.initialise_models()
 
@@ -93,7 +93,7 @@ class PolicyNetwork(tf.keras.Model):
         if not self.env:
             self.env = Environment(KG)
 
-        if not self.model:
+        if not hasattr(self, 'model'):
             self.model = PolicyNetwork(self.T, env=self.env)
             self.model.initialise_models()
 
