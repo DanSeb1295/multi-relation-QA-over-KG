@@ -4,7 +4,7 @@ triple2id.txt
 glove.6B.50d.txt
 entity2vec.bin
 relation2vec.bin
-saved_models/
+saved_models/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
