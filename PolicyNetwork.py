@@ -290,8 +290,13 @@ class PolicyNetwork():
         return beamed_actions
 
         
-    def sample_action(self, actions, probs):
-        sampled_index = np.random.choice(len(actions), p=probs)
+    def sample_action(self, actions, probabilities):
+        # Convert probabilities to log_probabilities and reshape it to [1, action_space]
+        rescaled_probas = tf.expand_dims(tf.log(probabilities), 0)  # shape [1, action_space]
+
+        # Draw one example from the distribution (we could draw more)
+        index = tf.multinomial(rescaled_probas, num_samples=1)
+        index = tf.squeeze(index, [0]).eval()[0]
         return actions[sampled_index]
 
 
