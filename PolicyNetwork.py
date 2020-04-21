@@ -68,12 +68,12 @@ class PolicyNetwork():
             val_acc.append(epoch_val_acc)
             
             # save results and weights
-            with open("results.txt", "a+") as f:
-                f.write("Iteration %s - train acc: %d, val acc: %d" % (epoch, epoch_train_acc, epoch_val_acc))
-            if epoch == 1:
-                save_checkpoint(self, 'model', epoch,write_meta_graph=True)
-            else:
-                save_checkpoint(self,'model',epoch)
+            # with open("results.txt", "a+") as f:
+            #     f.write("Iteration %s - train acc: %d, val acc: %d" % (epoch, epoch_train_acc, epoch_val_acc))
+            # if epoch == 1:
+            #     save_checkpoint(self, 'model', epoch,write_meta_graph=True)
+            # else:
+            #     save_checkpoint(self,'model',epoch)
 
         return train_acc, val_acc
 
