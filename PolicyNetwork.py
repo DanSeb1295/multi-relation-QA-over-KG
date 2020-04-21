@@ -12,6 +12,7 @@ from tqdm import tqdm
 class PolicyNetwork():
     def __init__(self, T, saved_model_path: str = ''):
         tf.compat.v1.disable_v2_behavior()
+        tf.compat.v1.enable_eager_execution()
         
         self.T = T
         self.env = None
@@ -297,12 +298,12 @@ class PolicyNetwork():
 
         # Draw one example from the distribution (we could draw more)
         index = tf.compat.v1.multinomial(rescaled_probas, num_samples=1)
-        index = tf.squeeze(index, [0])
+        index = tf.squeeze(index, [0]).numpy()[0]
         
         # index = K.eval(index)[0]
         # index = index.eval(session=tf.compat.v1.Session())
         # index = index[0]
-        return actions[index[0]]
+        return actions[index
 
 
     def softmax(self, vectors):
