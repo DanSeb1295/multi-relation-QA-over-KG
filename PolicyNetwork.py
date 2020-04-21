@@ -154,7 +154,7 @@ class PolicyNetwork():
         action_probs = []
         actions_onehot = []
 
-        temp_q = np.empty((0, 50))
+        temp_q = np.empty((0, 50)).astype(np.float32)
         for w in q:
             embeded_word = self.Embedder.embed_word(w)
             if embeded_word.all():
@@ -178,8 +178,8 @@ class PolicyNetwork():
         h_t[1] = set()        # OR LIST????
         S_t[1] = State(q, e_s, e_t[1], h_t[1])
         q_vector = self.bigru(q)                   # BiGRU Module
-        H_t[0] = np.zeros(d)
-        r_t[0] = np.zeros(d)
+        H_t[0] = np.zeros(d).astype(np.float32)
+        r_t[0] = np.zeros(d).astype(np.float32)
         
         self.env.start_new_query(S_t[1], ans)
         
@@ -228,7 +228,7 @@ class PolicyNetwork():
 
 
     def discount_rewards(self, rewards, normalize = False):
-        discounted_r = np.zeros_like(rewards)
+        discounted_r = np.zeros_like(rewards).astype(np.float32)
         running_add = 0
         for t in reversed(range(0, rewards.size)):
             if rewards[t] != 0:
