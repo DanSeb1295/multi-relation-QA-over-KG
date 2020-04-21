@@ -97,14 +97,26 @@ class PolicyNetwork():
         y_hat = []
         with tf.GradientTape() as tape:
             for inputs in tqdm(train_set):
-                try:
-                    predictions, outputs = self.forward(inputs)
-                    loss = self.REINFORCE_loss_function(outputs)
-                    self.opt.minimize(loss)
-                    y_hat.append(predictions)
-                except:
-                    print('Skipped one input tuple')
-                    continue
+                print('checkpoint1')
+                predictions, outputs = self.forward(inputs)
+                print('checkpoint2')
+                loss = self.REINFORCE_loss_function(outputs)
+                print('checkpoint3')
+                self.opt.minimize(loss)
+                print('checkpoint4')
+                y_hat.append(predictions)
+                # try:
+                #     print('checkpoint1')
+                #     predictions, outputs = self.forward(inputs)
+                #     print('checkpoint2')
+                #     loss = self.REINFORCE_loss_function(outputs)
+                #     print('checkpoint3')
+                #     self.opt.minimize(loss)
+                #     print('checkpoint4')
+                #     y_hat.append(predictions)
+                # except Exception as e:
+                #     print('Skipped one input tuple', e)
+                #     continue
             acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
             results = (acc, y_hat) if predictions else acc
         return results
@@ -119,11 +131,14 @@ class PolicyNetwork():
 
         for inputs in tqdm(val_set):
             try:
-                predicictions, outputs = self.forward(inputs)
+                print('checkpoint5')
+                predictions, outputs = self.forward(inputs)
+                print('checkpoint6')
                 y_hat.append(y_pred)
-            except:
-                print('Skipped one input tuple')
+            except Exception as e:
+                print('Skipped one input tuple', e)
                 continue
+
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
         results = (acc, y_hat) if predictions else acc
         return results
@@ -138,12 +153,19 @@ class PolicyNetwork():
         action_probs = []
         actions_onehot = []
 
-        q = [self.Embedder.embed_word(w) for w in q]
-        assert(None not in q) # Make sure words are all embedded
-        print('>>>', q.shape)
+        temp_q = np.empty((0, 50))
+        for w in q:
+            embeded_word = self.Embedder.embed_word(w)
+            if embeded_word.all():
+                temp_q = np.append(temp_q, embeded_word.reshape((1,50)), axis = 0)
+        q = temp_q
+
+        
+        print('>>>', q, q.shape)
+        n = q.shape[0]
         q = tf.convert_to_tensor(value=q)                         # Embedding Module
         q = tf.reshape(q,[1,*q.shape])
-        n = len(q)
+
 
         e_t = {}        # T x 1; entity
         h_t = {}        # T x set(); history

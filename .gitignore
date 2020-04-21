@@ -1,12 +1,6 @@
-__pycache__/
-.DS_Store
-
-# Environments
-.vscode
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+entity2id.txt
+relation2id.txt
+triple2id.txt
+glove.6B.50d.txt
+entity2vec.bin
+relation2vec.bin

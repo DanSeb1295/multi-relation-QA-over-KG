@@ -37,5 +37,10 @@ class EntityLinker:
       if item == entity:
         modified_question_list.append('<e>')
       else:
-        modified_question_list.append(item)
+        if len(item.split('_'))>0:
+          for x in item.split('_'):
+            if x != '':
+              modified_question_list.append(x)
+        else:
+          modified_question_list.append(item)
     return (modified_question_list, entity)
