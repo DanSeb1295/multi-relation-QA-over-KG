@@ -222,7 +222,7 @@ class PolicyNetwork():
             action_probs.append(action_distribution)
             actions_onehot.append(np_utils.to_categorical(np.arange(len(action_space)), num_classes=len(action_space)))
 
-        prediction = S_t[-1].e_t
+        prediction = S_t[len(S_t)].e_t
         discount_r = self.discount_rewards(rewards)
         action_probs = pad_sequences(action_probs,padding='post')
         actions_onehot = pad_sequences(actions_onehot,padding='post')
