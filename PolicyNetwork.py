@@ -159,13 +159,10 @@ class PolicyNetwork():
             if embeded_word.all():
                 temp_q = np.append(temp_q, embeded_word.reshape((1,50)), axis = 0)
         q = temp_q
-
         
-        print('>>>', q, q.shape)
-        n = q.shape[0]
         q = tf.convert_to_tensor(value=q, dtype=tf.float32)     # Embedding Module
-        q = tf.reshape(q,[1,*q.shape])
-
+        q = tf.reshape(q, [1, *q.shape])
+        print('>>>', q, q.shape)
 
         e_t = {}        # T x 1; entity
         h_t = {}        # T x set(); history
