@@ -24,5 +24,5 @@ class Attention():
 
     def beta_stars(self, r_star, w_t_m):
         output = r_star * w_t_m
-        b_star = tf.matmul(self.W, output) + self.b
+        b_star = self.W * output + self.b
         return b_star
