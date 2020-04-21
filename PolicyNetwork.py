@@ -297,7 +297,7 @@ class PolicyNetwork():
         # Draw one example from the distribution (we could draw more)
         index = tf.compat.v1.multinomial(rescaled_probas, num_samples=1)
         index = tf.squeeze(index, [0])
-        index = tf.keras.backend.eval(index)[0]
+        index = K.eval(index)[0]
         return actions[index]
 
 
