@@ -49,7 +49,7 @@ class Rewards():
         H_t = state_memory.get('H_t')
         q_t = state_memory.get('q_t')
         Q_t = np.zeros(d)
-        n = len(q.get(t. []))
+        n = len(q.get(t, []))
         for i in range(1, t):
             for j in range(n):
                 Q_t += q_t[i][j]
