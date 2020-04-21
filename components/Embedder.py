@@ -35,7 +35,7 @@ class Embedder:
     self.mid_to_name = self.read_tsv(mid_to_name_file)
     print('Done')
     print('Getting entity2id')
-    self.entity2id = self.read_tsv(entity2id_file)
+    # self.entity2id = self.read_tsv(entity2id_file)
     print('Done')
     print('Getting relation2id')
     self.relation2id = self.read_tsv(relation2id_file)

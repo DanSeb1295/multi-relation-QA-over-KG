@@ -9,7 +9,6 @@ from keras.preprocessing.sequence import pad_sequences
 from keras import utils as np_utils
 from tqdm import tqdm
 
-
 class PolicyNetwork():
     def __init__(self, T, saved_model_path: str = ''):
         self.T = T
@@ -55,6 +54,7 @@ class PolicyNetwork():
 
 
         with self.sess:
+            tf.compat.v1.enable_eager_execution()
             K.set_session(self.sess)
             self.sess.run(tf.compat.v1.global_variables_initializer())
 
