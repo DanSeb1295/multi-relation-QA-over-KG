@@ -185,7 +185,7 @@ class PolicyNetwork():
         
         for t in range(1, T+1):
             q_t[t] = self.slp(q_vector, t)             # Single-Layer Perceptron Module
-            H_t[t] = self.gru(H_t[t-1], r_t[t-1])     # History Encoder Module
+            H_t[t] = self.gru(r_t[t-1])     # History Encoder Module
             possible_actions = self.env.get_possible_actions()
             action_space = self.beam_search(possible_actions)
 
