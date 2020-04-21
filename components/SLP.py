@@ -16,7 +16,7 @@ class SLP():
         w_t = self.weights_dict[t]
         b_t = self.biases_dict[t]
 
-        logits = tf.matmul(q, wt)
+        logits = tf.matmul(q, w_t)
         logits = logits + b_t
         q_t = tf.math.tanh(logits)
 
