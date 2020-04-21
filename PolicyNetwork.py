@@ -57,7 +57,7 @@ class PolicyNetwork():
 
         # Create the model
         x = tf.compat.v1.placeholder(tf.float32, [len(train_set)])
-        y_ = tf.compat.v1.placeholder([len(train_set)])
+        y_ = tf.compat.v1.placeholder(tf.float32, [len(train_set)])
 
         predictions_outputs = self.run_train_op(x)
         predictions, outputs = tf.unstack(predictions_outputs, axis=1)
