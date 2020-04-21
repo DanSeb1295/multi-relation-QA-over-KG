@@ -22,7 +22,8 @@ class PolicyNetwork(tf.keras.Model):
         if saved_model_name:
             self.load_saved_model(saved_model_name)
 
-    def call(self, q_vector, H_t):
+    def call(self, x):
+        q_vector, H_t = x
         return self.sub_forward(q_vector, H_t)
 
     def load_saved_model(self, saved_model_path):
@@ -167,7 +168,7 @@ class PolicyNetwork(tf.keras.Model):
         r_0 = np.zeros(d).astype(np.float32)
         q_vector = self.model.bigru(q)                   # BiGRU Module
         self.model.env.start_new_query(State(q, e_s, e_s, set()), ans)
-        prediction, outputs = self.model(q_vector, self.model.gru(r_0))
+        prediction, outputs = self.model([q_vector, self.model.gru(r_0)])
         return prediction, outputs
         
         # #OUTPUTS
