@@ -193,7 +193,7 @@ class PolicyNetwork():
             for action in action_space:
                 # Attention Layer: Generate Similarity Scores between q and r and current point of attention
                 r_star = self.Embedder.embed_relation(action[0])
-                if r_star:
+                if r_star.all():
                     q_t_star[t] = self.attention(r_star, q_t[t])
 
                     # Perceptron Module: Generate Semantic Score for action given q
