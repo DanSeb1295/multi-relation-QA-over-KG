@@ -182,6 +182,10 @@ class PolicyNetwork():
         for t in range(1, T+1):
             q_t[t] = self.slp(q_vector, t)             # Single-Layer Perceptron Module
             possible_actions = self.env.get_possible_actions()
+
+            # Reached terminal node
+            if not possible_actions: break
+
             action_space = self.beam_search(possible_actions)
 
             semantic_scores = []
@@ -282,7 +286,7 @@ class PolicyNetwork():
             expected_reward = self.env.get_action_reward(action)
             actions_scores.append((action, expected_reward))
 
-        sorted_actions = sorted(actions_scores, key = lambda x: x[1])
+        sorted_actions = sorted(actions_scores, key = lambda x: x[1])[:beam_size]
         beamed_actions = [action_score[0] for action_score in sorted_actions]
 
         return beamed_actions
