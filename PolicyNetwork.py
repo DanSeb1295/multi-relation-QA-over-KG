@@ -102,14 +102,18 @@ class PolicyNetwork(tf.keras.Model):
         y_hat = []
         losses = []
         
+        print('============ TRAINING ============')
         with tf.GradientTape(persistent=True) as tape:
             for inputs in tqdm(train_set):
-                prediction, outputs = self.forward(inputs)
-                loss = self.REINFORCE_loss_function(outputs)
-                gradients = tape.gradient(loss, self.model.trainable_variables)
-                self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
-                y_hat.append(prediction)
-                losses.append(loss)
+                try:
+                    prediction, outputs = self.forward(inputs)
+                    loss = self.REINFORCE_loss_function(outputs)
+                    gradients = tape.gradient(loss, self.model.trainable_variables)
+                    self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
+                    y_hat.append(prediction)
+                    losses.append(loss)
+                except:
+                    continue
 
         acc = np.mean([y_hat[i] == train_set[i][-1] for i in range(len(y_hat))])
         loss = np.mean(losses)
@@ -122,14 +126,14 @@ class PolicyNetwork(tf.keras.Model):
         y_hat = []
         losses = []
 
+        print('============ VALIDATING ============')
         for inputs in tqdm(val_set):
             try:
                 prediction, outputs = self.forward(inputs)
                 loss = self.REINFORCE_loss_function(outputs)
                 y_hat.append(prediction)
                 losses.append(loss)
-            except Exception as e:
-                print('Skipped one input tuple', e)
+            except:
                 continue
 
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])

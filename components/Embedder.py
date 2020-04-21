@@ -121,5 +121,6 @@ class Embedder:
       vector_index = index * 50
       return self.relation_embedding[vector_index:vector_index+50]
     except Exception as e:
-      print('Not found in relation2id', e)
+      # print('Not found in relation2id', e)
+      return
 

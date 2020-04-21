@@ -37,7 +37,7 @@ train_att, val_att = policy_network.train(inputs, epochs=epochs, perceptron=Fals
 
 # TODO: Plot Results
 print(pd.DataFrame({'SRN': [np.mean(val_att_per[0])], 'w/o Attention': [np.mean(val_per[0])],
-                    'w/o Perceptron': [np.mean(val_att[0])]}, index=["PQ-2H"]).T)
+                    'w/o Perceptron': [np.mean(val_att[0])]}, index=["PQ-3H"]).T)
 
 # # plot epochs vs acc
 # xaxis = range(len(epochs))
@@ -48,9 +48,9 @@ print(pd.DataFrame({'SRN': [np.mean(val_att_per[0])], 'w/o Attention': [np.mean(
 # plt.title("Ablation Study of PQ-2H")
 # plt.xlabel('Epochs')
 # plt.ylabel('Validation Set Hits@1')
-# plt.plot(xaxis, val_att_per, 'r', label='SRN')
-# plt.plot(xaxis, val_per, 'b', label='no Attention layer')
-# plt.plot(xaxis, val_att, 'g', label='no Perceptron layer')
+# plt.plot(xaxis, val_att_per[0], 'r', label='SRN')
+# plt.plot(xaxis, val_per[0], 'b', label='no Attention layer')
+# plt.plot(xaxis, val_att[0], 'g', label='no Perceptron layer')
 # axes = plt.gca()
 # axes.set_ylim([ymin, ymax])
 
