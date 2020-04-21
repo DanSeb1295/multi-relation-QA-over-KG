@@ -43,13 +43,13 @@ class Rewards():
     def phi(self, state):
         state_memory = state.get_memory()
         t = state_memory.get('t')
-        
+
         if t == 1: return 0
         
         H_t = state_memory.get('H_t')
         q_t = state_memory.get('q_t')
         Q_t = np.zeros(d)
-        n = len(q.get(t, []))
+        n = len(q_t.get(t, []))
         for i in range(1, t):
             for j in range(n):
                 Q_t += q_t[i][j]
