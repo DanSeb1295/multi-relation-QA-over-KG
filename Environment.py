@@ -46,7 +46,7 @@ class Rewards():
         if t == 1: return 0
         
         H_t = state_memory.get('H_t')
-        q_t = state_memory.get('q_t').get(t, tf.zeros(d))
+        q_t = state_memory.get('q_t')
         Q_t = tf.zeros(d)
         n = len(q_t)
         for i in range(1, t):
