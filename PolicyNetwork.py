@@ -163,7 +163,7 @@ class PolicyNetwork():
         
         print('>>>', q, q.shape)
         n = q.shape[0]
-        q = tf.convert_to_tensor(value=q)                         # Embedding Module
+        q = tf.convert_to_tensor(value=q, dtype=tf.float32)     # Embedding Module
         q = tf.reshape(q,[1,*q.shape])
 
 

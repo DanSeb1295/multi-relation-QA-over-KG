@@ -15,13 +15,13 @@ class BiGRU():
     def compute(self, q):
         n = q.shape[1]
 
-        fw_out_1 = fw_1(q)
-        bw_out_1 = bw_1(q)
+        fw_out_1 = self.fw_1(q)
+        bw_out_1 = self.bw_1(q)
         hidden_out = tf.concat([fw_out_1, bw_out_1], 0)
         hidden_out = tf.reshape(hidden_out, (1, n, d))
         
-        fw_out_2 = fw_2(hidden_out)
-        bw_out_2 = bw_2(hidden_out)
+        fw_out_2 = self.fw_2(hidden_out)
+        bw_out_2 = self.bw_2(hidden_out)
         output = tf.concat([fw_out_2, bw_out_2], 0)
         output = tf.reshape(output, (1, n, d))
 
