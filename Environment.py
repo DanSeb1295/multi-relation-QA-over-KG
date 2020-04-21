@@ -58,8 +58,7 @@ class Rewards():
         #     cos_sim = 0
         # else:
         #     cos_sim = np.dot(Q_t, H_t) / norm_product
-        print('>>>', state_memory.get('H_t'))
-        print(H_t)
+
         Q_t = tf.nn.l2_normalize(Q_t, 0)
         H_t = tf.nn.l2_normalize(H_t, 0)
 
