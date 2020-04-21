@@ -1,10 +1,9 @@
-import numpy as np
-from numpy.linalg import norm
+import tensorflow as tf
 
 d = 50
 
 class State():
-    def __init__(self, q, e_s, e_t, h_t: set, t=1, q_t = [np.zeros(d)], H_t = np.zeros(d)):
+    def __init__(self, q, e_s, e_t, h_t: set, t=1, q_t = {0: tf.zeros(d)}, H_t = tf.zeros(d)):
         self.q = q
         self.e_s = e_s
         self.e_t = e_t
@@ -48,18 +47,22 @@ class Rewards():
         
         H_t = state_memory.get('H_t')
         q_t = state_memory.get('q_t')
-        Q_t = np.zeros(d)
+        Q_t = tf.zeros(d)
         n = len(q_t.get(t, []))
         for i in range(1, t):
             for j in range(n):
                 Q_t += q_t[i][j]
         
-        norm_product = (norm(Q_t) * norm(H_t))
-        if norm_product == 0:
-            cos_sim = 0
-        else:
-            cos_sim = np.dot(Q_t, H_t) / norm_product
-        print('HERE', max(cos_sim, 0))
+        # norm_product = (norm(Q_t) * norm(H_t))
+        # if norm_product == 0:
+        #     cos_sim = 0
+        # else:
+        #     cos_sim = np.dot(Q_t, H_t) / norm_product
+
+        Q_t = tf.nn.l2_normalize(Q_t, 0)
+        H_t = tf.nn.l2_normalize(H_t, 0)
+        cos_sim = tf.reduce_sum(tf.math.multiply(Q_t, H_t))
+
         return max(cos_sim, 0)
 
 
