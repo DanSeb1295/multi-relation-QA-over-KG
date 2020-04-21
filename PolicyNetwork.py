@@ -292,7 +292,7 @@ class PolicyNetwork():
 
         
     def sample_action(self, actions, probabilities):
-        tf.enable_eager_execution()
+        tf.compat.v1.enable_eager_execution()
         # Convert probabilities to log_probabilities and reshape it to [1, action_space]
         rescaled_probas = tf.expand_dims(K.log(probabilities), 0)  # shape [1, action_space]
 
@@ -303,7 +303,7 @@ class PolicyNetwork():
         # index = K.eval(index)[0]
         # index = index.eval(session=tf.compat.v1.Session())
         # index = index[0]
-        tf.disable_eager_execution()
+        tf.compat.v1.disable_v2_behavior()
         return actions[index]
 
 
