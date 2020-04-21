@@ -97,13 +97,9 @@ class PolicyNetwork():
         y_hat = []
         # with tf.GradientTape() as tape:
         for inputs in tqdm(train_set):
-            print('checkpoint1')
             predictions, outputs = self.forward(inputs)
-            print('checkpoint2')
             loss = self.REINFORCE_loss_function(outputs)
-            print('checkpoint3')
             self.opt.minimize(loss)
-            print('checkpoint4')
             y_hat.append(predictions)
             # try:
             #     print('checkpoint1')

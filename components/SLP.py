@@ -8,7 +8,7 @@ class SLP():
         self.weights_dict = {}
         self.biases_dict = {}
 
-        for t in range(T):
+        for t in range(1, T+1):
             self.weights_dict[t] = tf.Variable(initializer([d, d]), trainable=True)
             self.biases_dict[t] = tf.Variable(initializer([d]), trainable=True)
     
