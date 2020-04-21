@@ -187,7 +187,7 @@ class PolicyNetwork(tf.keras.Model):
         r_0 = np.zeros(d).astype(np.float32)
         q_vector = self.model.bigru(q)                   # BiGRU Module
         self.model.env.start_new_query(State(q, e_s, e_s, set()), ans)
-        prediction, outputs = self.model(q_vector, self.gru(r_0))
+        prediction, outputs = self.model(q_vector, self.model.gru(r_0))
         return predictions, outputs
         
         # for t in range(1, T+1):
