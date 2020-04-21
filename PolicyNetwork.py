@@ -194,6 +194,7 @@ class PolicyNetwork():
                 # Attention Layer: Generate Similarity Scores between q and r and current point of attention
                 r_star = self.Embedder.embed_relation(action[0])
                 if r_star.all():
+                    r_star = tf.Variable(r_star)
                     q_t_star[t] = self.attention(r_star, q_t[t])
 
                     # Perceptron Module: Generate Semantic Score for action given q
@@ -203,8 +204,8 @@ class PolicyNetwork():
                     continue
             
             # Softmax Module: Leading to selection of action according to policy
-            action_prob = self.softmax(semantic_scores)
-            action = self.sample_action(action_distribution)
+            action_prob = tf.nn.softmax(semantic_scores).numpy()
+            action = self.sample_action(action_space, action_distribution)
             a_t[t] = action
 
             # Take action, advance state, and get reward
