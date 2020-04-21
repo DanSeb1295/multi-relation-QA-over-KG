@@ -204,8 +204,7 @@ class PolicyNetwork():
                     continue
             
             # Softmax Module: Leading to selection of action according to policy
-            action_distribution = tf.nn.softmax(semantic_scores)
-            print('Action Priors Generated')
+            action_distribution = np.array(tf.nn.softmax(semantic_scores))
             action = self.sample_action(action_space, action_distribution)
             a_t[t] = action
 
