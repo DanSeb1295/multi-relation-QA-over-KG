@@ -3,7 +3,6 @@ from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
 from util import train_test_split, save_checkpoint
 import numpy as np
 import tensorflow as tf
-from tensorflow.compat.v1.keras import backend as K
 from tensorflow import keras
 from keras.preprocessing.sequence import pad_sequences
 from keras import utils as np_utils
@@ -246,10 +245,10 @@ class PolicyNetwork():
 
     def REINFORCE_loss_function(self, outputs):
         actions_onehot, action_probs, rewards = outputs
-        action_prob = K.sum(action_probs * actions_onehot, axis=1)        #Only use reward probability for chosen actions
-        log_action_prob = K.log(action_prob)                            #Log likelihood of probabilities
+        action_prob = tf.reduce_sum(action_probs * actions_onehot, axis=1)        #Only use reward probability for chosen actions
+        log_action_prob = tf.math.log(action_prob)                            #Log likelihood of probabilities
         loss = - log_action_prob * rewards
-        return K.mean(loss)
+        return tf.reduce_mean(loss)
 
 
     # TRAINABLE
@@ -293,7 +292,7 @@ class PolicyNetwork():
 
     def sample_action(self, actions, probabilities):
         # Convert probabilities to log_probabilities and reshape it to [1, action_space]
-        rescaled_probas = tf.expand_dims(K.log(probabilities), 0)  # shape [1, action_space]
+        rescaled_probas = tf.expand_dims(tf.math.log(probabilities), 0)  # shape [1, action_space]
 
         # Draw one example from the distribution (we could draw more)
         index = tf.compat.v1.multinomial(rescaled_probas, num_samples=1)
