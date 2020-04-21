@@ -3,7 +3,7 @@ import tensorflow as tf
 d = 50
 
 class State():
-    def __init__(self, q, e_s, e_t, h_t: set, t=1, q_t = {0: tf.zeros(d)}, H_t = tf.zeros(d)):
+    def __init__(self, q, e_s, e_t, h_t: set, t=1, q_t = {0: tf.zeros(d)}, H_t = {0: tf.zeros(d)}):
         self.q = q
         self.e_s = e_s
         self.e_t = e_t
@@ -45,7 +45,7 @@ class Rewards():
 
         if t == 1: return 0
         
-        H_t = state_memory.get('H_t')
+        H_t = state_memory.get('H_t').get(t, tf.zeros(d))
         q_t = state_memory.get('q_t')
         Q_t = tf.zeros(d)
         n = len(q_t)
