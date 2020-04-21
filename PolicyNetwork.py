@@ -183,7 +183,7 @@ class PolicyNetwork():
         self.env.start_new_query(S_t[1], ans)
         
         for t in range(1, T+1):
-            q_t[t] = self.slp(q_vector)             # Single-Layer Perceptron Module
+            q_t[t] = self.slp(q_vector, t)             # Single-Layer Perceptron Module
             H_t[t] = self.gru(H_t[t-1], r_t[t-1])     # History Encoder Module
             possible_actions = self.env.get_possible_actions()
             action_space = self.beam_search(possible_actions)
