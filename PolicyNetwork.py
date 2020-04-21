@@ -105,7 +105,7 @@ class PolicyNetwork(tf.keras.Model):
         self.beam_size = 1
         y_hat = []
         losses = []
-        with tf.GradientTape() as tape:
+        with tf.GradientTape(persistent=True) as tape:
             for inputs in tqdm(train_set):
                 prediction, outputs = self.forward(inputs)
                 loss = self.REINFORCE_loss_function(outputs)
