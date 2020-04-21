@@ -74,7 +74,7 @@ class Environment():
     def transit(self, action, t, q_t, H_t):
         new_state = self.get_next_state(action)
         new_state.set_memory(t+1, q_t, H_t)
-        new_reward = self.get_action_reward(action, new_state)
+        new_reward = self.get_transition_reward(self.current_state, action, new_state)
         self.current_state = new_state
         return new_state, new_reward
 
