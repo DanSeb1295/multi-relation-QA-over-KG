@@ -277,7 +277,7 @@ class PolicyNetwork(tf.keras.Model):
                     if self.use_attention:
                         q_t_star[t] = self.attention(r_star, q_t[t])
                     else:
-                        q_t_star[t] = tf.reduce_sum(q_t[t], 1)
+                        q_t_star[t] = tf.reduce_sum(q_t[t], 0)
 
                     # Perceptron Module: Generate Semantic Score for action given q
                     if self.use_perceptron:
