@@ -12,6 +12,7 @@ from tqdm import tqdm
 class PolicyNetwork():
     def __init__(self, T, saved_model_path: str = ''):
         # tf.compat.v1.disable_v2_behavior()
+        tf.compat.v1.enable_eager_execution()
         
         self.T = T
         self.env = None
