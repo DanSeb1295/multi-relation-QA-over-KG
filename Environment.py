@@ -45,8 +45,8 @@ class Rewards():
 
         if t == 1: return 0
         
-        H_t = state_memory.get('H_t').get(t, [])
-        q_t = state_memory.get('q_t').get(t, [])
+        H_t = state_memory.get('H_t')
+        q_t = state_memory.get('q_t').get(t, tf.zeros(d))
         Q_t = tf.zeros(d)
         n = len(q_t)
         for i in range(1, t):
@@ -61,6 +61,7 @@ class Rewards():
 
         Q_t = tf.nn.l2_normalize(Q_t, 0)
         H_t = tf.nn.l2_normalize(H_t, 0)
+
         cos_sim = tf.reduce_sum(tf.math.multiply(Q_t, H_t))
 
         return max(cos_sim, 0)
