@@ -34,7 +34,7 @@ class Rewards():
         SAS = (cur_state, action, next_state)
         if self.rewards_dict.get(SAS): return self.rewards_dict.get(SAS)    # Skip computation if reward has previously been computed
         
-        F_phi = self.gamma * phi(next_state) - phi(cur_state)
+        F_phi = self.gamma * self.phi(next_state) - self.phi(cur_state)
         R = 1 if next_state.e_t == ans else 0
         reward = R + F_phi
         self.rewards_dict[SAS] = reward     # Cache the (SAS -> R) mapping
