@@ -141,8 +141,8 @@ class PolicyNetwork():
         # results = (acc, y_hat) if predictions else acc
         # return results
         # return predictions, outputs
-        preds_actions_probs_discounts_r = tf.map_fn(lambda data: self.forward(data), train_set.eval())
-        predictions, actions_probs_discounts_rs = tf.unstack(preds_actions_probs_discounts_r, axis=1).eval()
+        preds_actions_probs_discounts_r = tf.map_fn(lambda data: self.forward(data), train_set.eval(self.sess))
+        predictions, actions_probs_discounts_rs = tf.unstack(preds_actions_probs_discounts_r, axis=1).eval(self.sess)
         pass
 
 
