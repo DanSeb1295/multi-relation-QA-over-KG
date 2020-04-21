@@ -246,7 +246,7 @@ class PolicyNetwork():
     def REINFORCE_loss_function(self, outputs):
         actions_onehot, action_probs, rewards = outputs
         action_prob = tf.reduce_sum(action_probs * actions_onehot, axis=1)        #Only use reward probability for chosen actions
-        log_action_prob = tf.math.log(action_prob)                            #Log likelihood of probabilities
+        log_action_prob = tf.math.log(tf.cast(action_prob, dtype=tf.float32))                            #Log likelihood of probabilities
         loss = - log_action_prob * rewards
         return tf.reduce_mean(loss)
 
