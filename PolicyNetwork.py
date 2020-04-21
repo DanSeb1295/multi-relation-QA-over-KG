@@ -220,7 +220,7 @@ class PolicyNetwork():
             #TODO: Implement discount factor
             rewards.append(new_reward)
             action_probs.append(action_distribution)
-            actions_onehot.append(np_utils.to_categorical(action, num_classes=len(action_prob)))
+            actions_onehot.append(np_utils.to_categorical(action, num_classes=len(action_distribution)))
 
         prediction = S_t[-1].e_t
         discount_r = self.discount_rewards(rewards)
