@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 from Environment import d
 
-HIDDEN_DIM = d / 2
+HIDDEN_DIM = int(d / 2)
 dropout = 0.3
 
 class BiGRU():

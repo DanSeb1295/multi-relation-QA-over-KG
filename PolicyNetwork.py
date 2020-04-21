@@ -162,7 +162,6 @@ class PolicyNetwork():
         
         q = tf.convert_to_tensor(value=q, dtype=tf.float32)     # Embedding Module
         q = tf.reshape(q, [1, *q.shape])
-        print('>>>', q, q.shape)
 
         e_t = {}        # T x 1; entity
         h_t = {}        # T x set(); history
