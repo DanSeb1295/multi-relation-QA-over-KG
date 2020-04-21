@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 class PolicyNetwork(tf.keras.Model):
     def __init__(self, T, saved_model_path: str = ''):
+        super(PolicyNetwork, self).__init__()
         self.T = T
         self.env = None
         self.beam_size = 1
