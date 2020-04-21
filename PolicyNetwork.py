@@ -216,7 +216,7 @@ class PolicyNetwork():
             S_t[t+1] = new_state
             
             # Record action, state and reward
-            trajectory += [S_t[t], a_t[t]]
+            # trajectory += [S_t[t], a_t[t]]
             #TODO: Implement discount factor
             rewards.append(new_reward)
             action_probs.append(action_prob)
