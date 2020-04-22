@@ -11,7 +11,7 @@ seed = 1
 np.random.seed(seed)
 tf.random.set_seed(seed)
 
-epochs = 2
+epochs = 10
 
 # paths for the KG and QA files
 path_KB = "./datasets/3H-kb.txt"
@@ -24,7 +24,7 @@ perceptron = True     # Use Perceptron for semantic similary scores
 
 # Prep Data
 KG, dataset = prep_dataset(path_KB, path_QA)
-dataset = dataset[:100]
+# dataset = dataset[:100]
 inputs = (KG, dataset, T)
 
 # Initialise Policy Network
@@ -33,20 +33,21 @@ inputs = (KG, dataset, T)
 print('\n\n*********** Policy Network with Perceptron & Attention ***********')
 model_name = fetch_model_name('combined')
 policy_network = PolicyNetwork(T, model_name)
-train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)                # Model uses both attention & perceptro layers
+# Model uses both attention & perceptro layers
+train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)
 
-print('\n\n*********** Policy Network with Perceptron Only ***********')
-model_name = fetch_model_name('perceptron')
-policy_network = PolicyNetwork(T, model_name)
-train_per, val_per = policy_network.train(inputs, epochs=epochs, attention=False)         # Model does not use attention layer
+# print('\n\n*********** Policy Network with Perceptron Only ***********')
+# model_name = fetch_model_name('perceptron')
+# policy_network = PolicyNetwork(T, model_name)
+# train_per, val_per = policy_network.train(inputs, epochs=epochs, attention=False)         # Model does not use attention layer
 
-print('\n\n*********** Policy Network with Attention Only ***********')
-model_name = fetch_model_name('attention')
-policy_network = PolicyNetwork(T, model_name)
-train_att, val_att = policy_network.train(inputs, epochs=epochs, perceptron=False)        # Model does not use perceptron layer
+# print('\n\n*********** Policy Network with Attention Only ***********')
+# model_name = fetch_model_name('attention')
+# policy_network = PolicyNetwork(T, model_name)
+# train_att, val_att = policy_network.train(inputs, epochs=epochs, perceptron=False)        # Model does not use perceptron layer
 
-print(pd.DataFrame({'SRN': [np.mean(val_att_per[0])], 'w/o Attention': [np.mean(val_per[0])],
-                    'w/o Perceptron': [np.mean(val_att[0])]}, index=["PQ-3H"]).T)
+# print(pd.DataFrame({'SRN': [np.mean(val_att_per[0])], 'w/o Attention': [np.mean(val_per[0])],
+#                     'w/o Perceptron': [np.mean(val_att[0])]}, index=["PQ-3H"]).T)
 
 # Plot Results
 xaxis = range(1, epochs + 1)
