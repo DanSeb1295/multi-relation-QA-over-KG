@@ -10,6 +10,10 @@ saved_models/*
 !saved_models/.gitkeep
 !saved_models/model_names.ini
 
+# Results Dir
+results/*
+!results/.gitkeep
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

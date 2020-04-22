@@ -359,7 +359,7 @@ class PolicyNetwork(tf.keras.Model):
         #     discounted_r = (discounted_r - np.mean(discounted_r)
         #                     ) / (np.std(discounted_r) + 1e-7)
 
-        discounted_r = tf.Variable(0)
+        discounted_r = tf.Variable(0, dtype=tf.float32)
         for t in reversed(range(0, len(rewards))):
             discounted_r = self.ita_discount * discounted_r + rewards[t]
         return discounted_r
