@@ -275,6 +275,9 @@ class PolicyNetwork(tf.keras.Model):
 
             action_space = self.beam_search(possible_actions)
 
+            # Sample from temp action space only if action has embedding
+            temp_action_space = action_space.copy()
+
             semantic_scores = []
             for action in action_space:
                 # Attention Layer: Generate Similarity Scores between q and r and current point of attention
@@ -297,13 +300,14 @@ class PolicyNetwork(tf.keras.Model):
 
                     semantic_scores.append(score)
                 else:
+                    temp_action_space.remove(action)
                     continue
 
             if not semantic_scores: break
 
             # Softmax Module: Leading to selection of action according to policy
             action_distribution = tf.nn.softmax(semantic_scores)
-            index, action = self.sample_action(action_space, action_distribution)
+            index, action = self.sample_action(temp_action_space, action_distribution)
 
             a_t[t] = action
             r_t[t] = self.Embedder.embed_relation(action[0])
