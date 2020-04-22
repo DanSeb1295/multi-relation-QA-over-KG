@@ -316,10 +316,11 @@ class PolicyNetwork(tf.keras.Model):
         if not rewards:
             return prediction, None
         discount_r = self.discount_rewards(rewards)
-        action_probs = pad_sequences(action_probs,padding='post')
-        actions_onehot = pad_sequences(actions_onehot,padding='post')
+        output = []
+        for onehot, prob in zip(action_probs, actions_onehot):
+          action_prob.append(tf.reduce_sum(prob * onehot, axis=1))
 
-        return prediction, [actions_onehot,action_probs,discount_r]
+        return prediction, output
 
 
     def discount_rewards(self, rewards, normalize = False):
@@ -336,10 +337,8 @@ class PolicyNetwork(tf.keras.Model):
         return discounted_r
 
 
-    def REINFORCE_loss_function(self, outputs):
-        actions_onehot, action_probs, rewards = outputs
-        action_prob = tf.reduce_sum(action_probs * actions_onehot, axis=1)        #Only use reward probability for chosen actions
-        log_action_prob = tf.math.log(tf.cast(action_prob, dtype=tf.float32))     #Log likelihood of probabilities
+    def REINFORCE_loss_function(self, output):
+        log_action_prob = tf.math.log(tf.cast(output, dtype=tf.float32))     #Log likelihood of probabilities
         loss = - log_action_prob * rewards
         return tf.reduce_mean(loss)
 
