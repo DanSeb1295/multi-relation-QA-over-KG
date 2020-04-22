@@ -80,11 +80,13 @@ class PolicyNetwork(tf.keras.Model):
             
             # Save Model
             model_name = 'model'
-            model_type = 'combined'
-            if attention: 
+            if attention and perceptron:
+                model_name += '_combined'
+                model_type = 'combined'
+            elif attention and not perceptron: 
                 model_name += '_att'
                 model_type = 'attention'
-            if perceptron: 
+            elif perceptron and not attention: 
                 model_name += '_per'
                 model_type = 'perceptron'
             model_name += str(i + 1)
