@@ -11,7 +11,7 @@ seed = 1
 np.random.seed(seed)
 tf.random.set_seed(seed)
 
-epochs = 10
+epochs = 2
 
 # paths for the KG and QA files
 path_KB = "./datasets/3H-kb.txt"

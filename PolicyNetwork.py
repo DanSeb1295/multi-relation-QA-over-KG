@@ -44,7 +44,7 @@ class PolicyNetwork(tf.keras.Model):
 
     def initialise(self):
         if not self.env:
-            self.env = Environment(KG)
+            self.env = Environment(self.KG)
 
         if not hasattr(self, 'model'):
             self.model = PolicyNetwork(self.T, env=self.env)
