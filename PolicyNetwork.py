@@ -132,7 +132,8 @@ class PolicyNetwork(tf.keras.Model):
                 y_hat.append(prediction)
                 if all(x is None for x in outputs):
                     continue
-                loss = self.REINFORCE_loss_function(outputs)
+                loss = -outputs[-1][0]
+                # loss = self.REINFORCE_loss_function(outputs)
             gradients = tape.gradient(loss, self.model.trainable_variables)
             self.opt.apply_gradients(
                 zip(gradients, self.model.trainable_variables))
@@ -156,7 +157,8 @@ class PolicyNetwork(tf.keras.Model):
             y_hat.append(prediction)
             if all(x is None for x in outputs):
                 continue
-            loss = self.REINFORCE_loss_function(outputs)
+            # loss = self.REINFORCE_loss_function(outputs)
+            loss = -outputs[-1][0]
             losses.append(loss)
 
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
@@ -367,7 +369,6 @@ class PolicyNetwork(tf.keras.Model):
         return tf.reduce_mean(loss)
 
     # TRAINABLE
-
     def bigru(self, q):
         # Returns: q_vector
         return self.BiGRU.compute(q)
