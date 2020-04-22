@@ -24,6 +24,7 @@ perceptron = True     # Use Perceptron for semantic similary scores
 
 # Prep Data
 KG, dataset = prep_dataset(path_KB, path_QA)
+dataset = dataset[:100]
 inputs = (KG, dataset, T)
 
 # Initialise Policy Network
