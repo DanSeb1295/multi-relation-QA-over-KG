@@ -118,18 +118,15 @@ class PolicyNetwork(tf.keras.Model):
         losses = []
         
         print('\n============ TRAINING ============')
-        with tf.GradientTape(persistent=True) as tape:
-            for inputs in tqdm(train_set):
-                try:
-                    prediction, outputs = self.forward(inputs)
-                    loss = self.REINFORCE_loss_function(outputs)
-                    gradients = tape.gradient(loss, self.model.trainable_variables)
-                    self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
-                    y_hat.append(prediction)
-                    losses.append(loss)
-                except Exception as error:
-                    print('handled', error)
-                    continue
+        for inputs in tqdm(train_set):
+            with tf.GradientTape(persistent=True) as tape:
+                prediction, outputs = self.forward(inputs)
+                y_hat.append(prediction)
+                if outputs is None: continue
+                loss = self.REINFORCE_loss_function(outputs)
+            gradients = tape.gradient(loss, self.model.trainable_variables)
+            self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
+            losses.append(loss)
 
         acc = np.mean([y_hat[i] == train_set[i][-1] for i in range(len(y_hat))])
         loss = np.mean(losses)
@@ -144,15 +141,11 @@ class PolicyNetwork(tf.keras.Model):
 
         print('\n============ VALIDATING ============')
         for inputs in tqdm(val_set):
-                try:
-                    prediction, outputs = self.forward(inputs)
-                    loss = self.REINFORCE_loss_function(outputs)
-                    y_hat.append(prediction)
-                    losses.append(loss)
-                except Exception as error:
-                    print('handled', error)
-                    continue
-
+            prediction, outputs = self.forward(inputs)
+            y_hat.append(prediction)
+            if outputs is None: continue
+            loss = self.REINFORCE_loss_function(outputs)
+            losses.append(loss)
 
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
         loss = np.mean(losses)
@@ -170,7 +163,6 @@ class PolicyNetwork(tf.keras.Model):
             if embeded_word is not None and embeded_word.all():
                 temp_q = np.append(temp_q, embeded_word.reshape((1,50)), axis = 0)
         q = temp_q
-        
         q = tf.convert_to_tensor(value=q, dtype=tf.float32)     # Embedding Module
         q = tf.reshape(q, [1, *q.shape])
 
@@ -276,8 +268,6 @@ class PolicyNetwork(tf.keras.Model):
 
             action_space = self.beam_search(possible_actions)
 
-            assert(len(action_space) > 0), "Empty action space"
-
             semantic_scores = []
             for action in action_space:
                 # Attention Layer: Generate Similarity Scores between q and r and current point of attention
@@ -302,6 +292,8 @@ class PolicyNetwork(tf.keras.Model):
                 else:
                     continue
 
+            if not semantic_scores: break
+
             # Softmax Module: Leading to selection of action according to policy
             action_distribution = tf.nn.softmax(semantic_scores)
             action = self.sample_action(action_space, action_distribution)
@@ -321,6 +313,8 @@ class PolicyNetwork(tf.keras.Model):
             actions_onehot.append(np_utils.to_categorical(np.arange(len(action_space)), num_classes=len(action_space)))
 
         prediction = S_t[len(S_t)].e_t
+        if not rewards:
+            return prediction, None
         discount_r = self.discount_rewards(rewards)
         action_probs = pad_sequences(action_probs,padding='post')
         actions_onehot = pad_sequences(actions_onehot,padding='post')
