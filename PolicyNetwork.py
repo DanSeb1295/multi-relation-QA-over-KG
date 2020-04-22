@@ -318,7 +318,7 @@ class PolicyNetwork(tf.keras.Model):
         discount_r = self.discount_rewards(rewards)
         output = []
         for onehot, prob in zip(action_probs, actions_onehot):
-          action_prob.append(tf.reduce_sum(prob * onehot, axis=1))
+          output.append(tf.reduce_sum(prob * onehot, axis=1))
 
         return prediction, output
 
