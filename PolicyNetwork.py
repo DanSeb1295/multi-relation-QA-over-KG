@@ -42,6 +42,15 @@ class PolicyNetwork(tf.keras.Model):
         self.Embedder = Embedder()
 
 
+    def initialise(self):
+        if not self.env:
+            self.env = Environment(KG)
+
+        if not hasattr(self, 'model'):
+            self.model = PolicyNetwork(self.T, env=self.env)
+            self.model.initialise_models()
+
+
     def train(self, inputs, epochs=10, attention=True, perceptron=True):
         KG, dataset, T = inputs
         train_set, test_set = train_test_split(dataset)
@@ -50,12 +59,7 @@ class PolicyNetwork(tf.keras.Model):
         self.T = T
         self.KG = KG
         
-        if not self.env:
-            self.env = Environment(KG)
-
-        if not hasattr(self, 'model'):
-            self.model = PolicyNetwork(self.T, env=self.env)
-            self.model.initialise_models()
+        self.initialise()
 
         self.model.use_attention = attention
         self.model.use_perceptron = perceptron
@@ -98,12 +102,7 @@ class PolicyNetwork(tf.keras.Model):
         self.T = T
         self.KG = KG
         
-        if not self.env:
-            self.env = Environment(KG)
-
-        if not hasattr(self, 'model'):
-            self.model = PolicyNetwork(self.T, env=self.env)
-            self.model.initialise_models()
+        self.initialise()
 
         self.model.use_attention = attention
         self.model.use_perceptron = perceptron
@@ -123,17 +122,14 @@ class PolicyNetwork(tf.keras.Model):
             for inputs in tqdm(train_set):
                 try:
                     prediction, outputs = self.forward(inputs)
-                except AssertionError as error:
+                    loss = self.REINFORCE_loss_function(outputs)
+                    gradients = tape.gradient(loss, self.model.trainable_variables)
+                    self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
+                    y_hat.append(prediction)
+                    losses.append(loss)
+                except Exception as error:
                     print('handled', error)
                     continue
-                except InvalidArgumentError as error:
-                    print('handled', error)
-                    continue
-                loss = self.REINFORCE_loss_function(outputs)
-                gradients = tape.gradient(loss, self.model.trainable_variables)
-                self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
-                y_hat.append(prediction)
-                losses.append(loss)
 
         acc = np.mean([y_hat[i] == train_set[i][-1] for i in range(len(y_hat))])
         loss = np.mean(losses)
@@ -150,15 +146,12 @@ class PolicyNetwork(tf.keras.Model):
         for inputs in tqdm(val_set):
                 try:
                     prediction, outputs = self.forward(inputs)
-                except AssertionError as error:
+                    loss = self.REINFORCE_loss_function(outputs)
+                    y_hat.append(prediction)
+                    losses.append(loss)
+                except Exception as error:
                     print('handled', error)
                     continue
-                except InvalidArgumentError as error:
-                    print('handled', error)
-                    continue
-            loss = self.REINFORCE_loss_function(outputs)
-            y_hat.append(prediction)
-            losses.append(loss)
 
 
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
