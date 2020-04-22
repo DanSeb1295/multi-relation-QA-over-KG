@@ -124,7 +124,10 @@ class PolicyNetwork(tf.keras.Model):
                 try:
                     prediction, outputs = self.forward(inputs)
                 except AssertionError as error:
-                    print(error)
+                    print('handled', error)
+                    continue
+                except InvalidArgumentError as error:
+                    print('handled', error)
                     continue
                 loss = self.REINFORCE_loss_function(outputs)
                 gradients = tape.gradient(loss, self.model.trainable_variables)
@@ -145,11 +148,14 @@ class PolicyNetwork(tf.keras.Model):
 
         print('\n============ VALIDATING ============')
         for inputs in tqdm(val_set):
-            try:
-                prediction, outputs = self.forward(inputs)
-            except AssertionError as error:
-                print(error)
-                continue
+                try:
+                    prediction, outputs = self.forward(inputs)
+                except AssertionError as error:
+                    print('handled', error)
+                    continue
+                except InvalidArgumentError as error:
+                    print('handled', error)
+                    continue
             loss = self.REINFORCE_loss_function(outputs)
             y_hat.append(prediction)
             losses.append(loss)
@@ -277,7 +283,7 @@ class PolicyNetwork(tf.keras.Model):
 
             action_space = self.beam_search(possible_actions)
 
-            assert(len(action_space) > 0), Empty action space
+            assert(len(action_space) > 0), "Empty action space"
 
             semantic_scores = []
             for action in action_space:
