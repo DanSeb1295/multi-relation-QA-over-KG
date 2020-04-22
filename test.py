@@ -8,6 +8,7 @@ from keras.preprocessing.sequence import pad_sequences
 from keras import utils as np_utils
 from tqdm import tqdm
 
+
 class PolicyNetwork(tf.keras.Model):
     def __init__(self, T, saved_model_name: str = '', env: Environment = None):
         super(PolicyNetwork, self).__init__()
@@ -16,11 +17,12 @@ class PolicyNetwork(tf.keras.Model):
         self.beam_size = 1
         self.lr = 1e-3
         self.ita_discount = 0.9
-        self.opt = tf.keras.optimizers.Adam(learning_rate = self.lr)
+        self.opt = tf.keras.optimizers.Adam(learning_rate=self.lr)
         self.save_model_dir = './saved_models/'
 
         if saved_model_name:
             self.load_saved_model(saved_model_name)
+    # @tf.function
 
     def call(self, x):
         q_vector, H_t = x
@@ -28,10 +30,10 @@ class PolicyNetwork(tf.keras.Model):
 
     def load_saved_model(self, saved_model_name):
         try:
-            self.model = keras.models.load_model(self.save_model_dir + saved_model_name)
+            self.model = keras.models.load_model(
+                self.save_model_dir + saved_model_name)
         except:
             print('Load failed. Initialise new network.')
-            
 
     def initialise_models(self):
         self.GRU = GRU()
@@ -41,7 +43,6 @@ class PolicyNetwork(tf.keras.Model):
         self.SLP = SLP(self.T)
         self.Embedder = Embedder()
 
-
     def initialise(self):
         if not self.env:
             self.env = Environment(self.KG)
@@ -50,7 +51,6 @@ class PolicyNetwork(tf.keras.Model):
             self.model = PolicyNetwork(self.T, env=self.env)
             self.model.initialise_models()
 
-
     def train(self, inputs, epochs=10, attention=True, perceptron=True):
         KG, dataset, T = inputs
         train_set, test_set = train_test_split(dataset)
@@ -58,7 +58,7 @@ class PolicyNetwork(tf.keras.Model):
         # Hyperparameters configuration
         self.T = T
         self.KG = KG
-        
+
         self.initialise()
 
         self.model.use_attention = attention
@@ -73,37 +73,41 @@ class PolicyNetwork(tf.keras.Model):
             print("\n>>>>>>>>>>>> EPOCH: ", i + 1, " / ", epochs)
             train_accuracy, train_loss = self.run_train_op(train_set)
             val_accuracy, val_loss = self.run_val_op(test_set)
-            
+
             train_acc.append(train_accuracy)
             train_losses.append(train_loss)
             val_acc.append(val_accuracy)
             train_losses.append(val_loss)
-            
+
             # Save Model
             model_name = 'model'
             if attention and perceptron:
                 model_name += '_combined'
                 model_type = 'combined'
-            elif attention and not perceptron: 
+            elif attention and not perceptron:
                 model_name += '_att'
                 model_type = 'attention'
-            elif perceptron and not attention: 
+            elif perceptron and not attention:
                 model_name += '_per'
                 model_type = 'perceptron'
             model_name += str(i + 1)
-            
+
             write_model_name(model_name, model_type)
             # tf.saved_model.save(self.model, self.save_model_dir + model_name
             #     # , signatures=self.model.get_concrete_function(tf.TensorSpec(shape=[None, None], dtype=tf.float32))
             #     )
-            
+            checkpoint_path = './ckpt/'
+            ckpt = tf.train.Checkpoint(model=self.model, optimizer=self.opt)
+            ckpt.save('./testcheckpoint')
+
             # Save Results
-            results_file = self.save_model_dir + "{}_results.csv".format(model_type)
+            results_file = self.save_model_dir + \
+                "{}_results.csv".format(model_type)
             with open(results_file, "a+") as f:
-                f.write("epoch {}, {}, {}, {}, {}\n".format(i, train_acc, train_losses, val_acc, val_losses))
+                f.write("epoch {}, {}, {}, {}, {}\n".format(
+                    i, train_acc, train_losses, val_acc, val_losses))
 
         return (train_acc, train_losses), (val_acc, val_losses)
-
 
 
     def predict(self, inputs, attention=True, perceptron=True):
@@ -111,39 +115,40 @@ class PolicyNetwork(tf.keras.Model):
         # Hyperparameters configuration
         self.T = T
         self.KG = KG
-        
+
         self.initialise()
 
         self.model.use_attention = attention
         self.model.use_perceptron = perceptron
 
-        val_acc, predictions = self.run_val_op(dataset, predictions = True)
+        val_acc, predictions = self.run_val_op(dataset, predictions=True)
         return val_acc, predictions
-
-
-    def run_train_op(self, train_set, predictions = False):
+    def run_train_op(self, train_set, predictions=False):
         # Hyperparameters configuration
         self.model.beam_size = 1
         y_hat = []
         losses = []
-        
+
         print('\n============ TRAINING ============')
         for inputs in tqdm(train_set):
             with tf.GradientTape(persistent=True) as tape:
                 prediction, outputs = self.forward(inputs)
                 y_hat.append(prediction)
-                if all(x is None for x in outputs):continue
+                if all(x is None for x in outputs):
+                    continue
                 loss = self.REINFORCE_loss_function(outputs)
             gradients = tape.gradient(loss, self.model.trainable_variables)
-            self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
+            self.opt.apply_gradients(
+                zip(gradients, self.model.trainable_variables))
             losses.append(loss)
 
-        acc = np.mean([y_hat[i] == train_set[i][-1] for i in range(len(y_hat))])
+        acc = np.mean([y_hat[i] == train_set[i][-1]
+                       for i in range(len(y_hat))])
         loss = np.mean(losses)
-        
+
         return acc, loss
 
-    def run_val_op(self, val_set, predictions = False):
+    def run_val_op(self, val_set, predictions=False):
         # Hyperparameters configuration
         self.model.beam_size = 32
         y_hat = []
@@ -153,15 +158,15 @@ class PolicyNetwork(tf.keras.Model):
         for inputs in tqdm(val_set):
             prediction, outputs = self.forward(inputs)
             y_hat.append(prediction)
-            if all(x is None for x in outputs): continue
+            if all(x is None for x in outputs):
+                continue
             loss = self.REINFORCE_loss_function(outputs)
             losses.append(loss)
 
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
         loss = np.mean(losses)
-        
-        return acc, loss
 
+        return acc, loss
 
     def forward(self, inputs):
         q, e_s, ans = inputs
@@ -171,18 +176,21 @@ class PolicyNetwork(tf.keras.Model):
         for w in q:
             embeded_word = self.model.Embedder.embed_word(w)
             if embeded_word is not None and embeded_word.all():
-                temp_q = np.append(temp_q, embeded_word.reshape((1,50)), axis = 0)
+                temp_q = np.append(
+                    temp_q, embeded_word.reshape((1, 50)), axis=0)
         q = temp_q
-        q = tf.convert_to_tensor(value=q, dtype=tf.float32)     # Embedding Module
+        q = tf.convert_to_tensor(
+            value=q, dtype=tf.float32)     # Embedding Module
         q = tf.reshape(q, [1, *q.shape])
 
         r_0 = np.zeros(d).astype(np.float32)
         q_vector = self.model.bigru(q)                   # BiGRU Module
         self.model.env.start_new_query(State(q, e_s, e_s, set()), ans)
-        prediction, actions_onehot, action_probs, discount_r = self.model([q_vector, self.model.gru(r_0)])
+        prediction, actions_onehot, action_probs, discount_r = self.model(
+            [q_vector, self.model.gru(r_0)])
         outputs = [actions_onehot, action_probs, discount_r]
         return prediction, outputs
-        
+
         # #OUTPUTS
         # rewards = []
         # action_probs = []
@@ -199,8 +207,7 @@ class PolicyNetwork(tf.keras.Model):
         # H_t[0] = np.zeros(d).astype(np.float32)
         # r_t[0] = np.zeros(d).astype(np.float32)
         # H_t[1] = self.gru(r_t[0])                 # History Encoder Module
-        
-        
+
         # for t in range(1, T+1):
         #     q_t[t] = self.slp(q_vector, t)             # Single-Layer Perceptron Module
         #     possible_actions = self.env.get_possible_actions()
@@ -223,7 +230,7 @@ class PolicyNetwork(tf.keras.Model):
         #             semantic_scores.append(score)
         #         else:
         #             continue
-            
+
         #     # Softmax Module: Leading to selection of action according to policy
         #     action_distribution = tf.nn.softmax(semantic_scores)
         #     action = self.sample_action(action_space, action_distribution)
@@ -236,7 +243,7 @@ class PolicyNetwork(tf.keras.Model):
         #     # q_t & H_t passed in order to generate the new State object within Environment
         #     new_state, new_reward = self.env.transit(action, t, q_t, H_t)
         #     S_t[t+1] = new_state
-            
+
         #     # Record action, state and reward
         #     # trajectory += [S_t[t], a_t[t]]
         #     #TODO: Implement discount factor
@@ -252,7 +259,7 @@ class PolicyNetwork(tf.keras.Model):
         # return prediction, [actions_onehot,action_probs,discount_r]
 
     def sub_forward(self, q_vector, H_t_t):
-        #OUTPUTS
+        # OUTPUTS
         rewards = []
         action_probs = []
         actions_onehot = []
@@ -275,7 +282,8 @@ class PolicyNetwork(tf.keras.Model):
             possible_actions = self.env.get_possible_actions()
 
             # Reached terminal node
-            if not possible_actions: break
+            if not possible_actions:
+                break
 
             action_space = self.beam_search(possible_actions)
             temp_action_space = action_space.copy()
@@ -297,18 +305,21 @@ class PolicyNetwork(tf.keras.Model):
                     else:
                         r_star = tf.nn.l2_normalize(r_star, 0)
                         temp_q_t_star = tf.nn.l2_normalize(q_t_star[t], 0)
-                        score = tf.reduce_sum(tf.math.multiply(r_star, temp_q_t_star))
+                        score = tf.reduce_sum(
+                            tf.math.multiply(r_star, temp_q_t_star))
 
                     semantic_scores.append(score)
                 else:
                     temp_action_space.remove(action)
                     continue
 
-            if not semantic_scores: break
+            if not semantic_scores:
+                break
 
             # Softmax Module: Leading to selection of action according to policy
             action_distribution = tf.nn.softmax(semantic_scores)
-            index, action = self.sample_action(temp_action_space, action_distribution)
+            index, action = self.sample_action(
+                temp_action_space, action_distribution)
 
             a_t[t] = action
             r_t[t] = self.Embedder.embed_relation(action[0])
@@ -322,20 +333,19 @@ class PolicyNetwork(tf.keras.Model):
             # Record action, state and reward
             rewards.append(new_reward)
             action_probs.append(action_distribution)
-            actions_onehot.append(np_utils.to_categorical(index, num_classes=len(temp_action_space)))
+            actions_onehot.append(np_utils.to_categorical(
+                index, num_classes=len(temp_action_space)))
 
         prediction = S_t[len(S_t)].e_t
         if not rewards:
             return [prediction, None, None, None]
         discount_r = self.discount_rewards(rewards)
         output = []
-        action_probs = pad_sequences(action_probs,padding='post')
-        actions_onehot = pad_sequences(actions_onehot,padding='post')
+        action_probs = pad_sequences(action_probs, padding='post')
+        actions_onehot = pad_sequences(actions_onehot, padding='post')
+        return [prediction, actions_onehot, action_probs, discount_r]
 
-        return [prediction, actions_onehot,action_probs,discount_r]
-
-
-    def discount_rewards(self, rewards, normalize = False):
+    def discount_rewards(self, rewards, normalize=False):
         discounted_r = np.zeros_like(rewards).astype(np.float32)
         running_add = 0
         for t in reversed(range(0, len(rewards))):
@@ -345,19 +355,20 @@ class PolicyNetwork(tf.keras.Model):
             discounted_r[t] = running_add
 
         if normalize:
-            discounted_r = (discounted_r - np.mean(discounted_r)) / (np.std(discounted_r) + 1e-7)
+            discounted_r = (discounted_r - np.mean(discounted_r)
+                            ) / (np.std(discounted_r) + 1e-7)
         return discounted_r
-
 
     def REINFORCE_loss_function(self, outputs):
         actions_onehot, action_probs, rewards = outputs
         action_prob = tf.reduce_sum(action_probs * actions_onehot, axis=1)
-        log_action_prob = tf.math.log(tf.cast(action_prob, dtype=tf.float32))     #Log likelihood of probabilities
+        # Log likelihood of probabilities
+        log_action_prob = tf.math.log(tf.cast(action_prob, dtype=tf.float32))
         loss = - log_action_prob * rewards
         return tf.reduce_mean(loss)
 
-
     # TRAINABLE
+
     def bigru(self, q):
         # Returns: q_vector
         return self.BiGRU.compute(q)
@@ -370,7 +381,7 @@ class PolicyNetwork(tf.keras.Model):
     # TRAINABLE
     def gru(self, r_t):
         # Returns: H_t_plus_1 = GRU(H_t, r_t)
-        return self.GRU.compute(r_t)        
+        return self.GRU.compute(r_t)
 
     # TRAINABLE
     def attention(self, r_star, q_t):
@@ -381,29 +392,28 @@ class PolicyNetwork(tf.keras.Model):
     def perceptron(self, r_star, H_t, q_t_star):
         # Returns: S(a_t, q) = r_star * W_L2 * ReLU(W_L1 * [H_t; q_t_star])
         return self.Perceptron.compute(r_star, H_t, q_t_star)
-
-
-    def beam_search(self, possible_actions, beam_size = None):
+    def beam_search(self, possible_actions, beam_size=None):
         if not beam_size:
             beam_size = self.beam_size
-        
+
         actions_scores = []
         for action in possible_actions:
             expected_reward = self.env.get_action_reward(action)
             actions_scores.append((action, expected_reward))
 
-        sorted_actions = sorted(actions_scores, key = lambda x: x[1])[:beam_size]
+        sorted_actions = sorted(actions_scores, key=lambda x: x[1])[:beam_size]
         beamed_actions = [action_score[0] for action_score in sorted_actions]
 
         return beamed_actions
 
-
     def sample_action(self, actions, probabilities):
         # Convert probabilities to log_probabilities and reshape it to [1, action_space]
-        rescaled_probas = tf.expand_dims(tf.math.log(probabilities), 0)  # shape [1, action_space]
+        rescaled_probas = tf.expand_dims(tf.math.log(
+            probabilities), 0)  # shape [1, action_space]
 
         # Draw one example from the distribution (we could draw more)
-        index = tf.compat.v1.multinomial(rescaled_probas, num_samples=1)
-        index = tf.squeeze(index, [0]).numpy()[0]
-        
+        # index = tf.compat.v1.multinomial(rescaled_probas, num_samples=1)
+        # index = tf.squeeze(index, [0]).numpy()[0]
+        index = tf.random.categorical(
+            rescaled_probas, num_samples=1).numpy()[0][0]
         return index, actions[index]
