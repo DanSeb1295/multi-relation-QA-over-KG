@@ -8,6 +8,7 @@ relation2vec.bin
 # Saved Models Dir
 saved_models/*
 !saved_models/.gitkeep
+!saved_models/model_names.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
