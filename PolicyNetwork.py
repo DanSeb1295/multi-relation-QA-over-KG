@@ -22,7 +22,6 @@ class PolicyNetwork(tf.keras.Model):
         if saved_model_name:
             self.load_saved_model(saved_model_name)
 
-    @tf.function
     def call(self, x):
         q_vector, H_t = x
         return self.sub_forward(q_vector, H_t)
@@ -93,8 +92,9 @@ class PolicyNetwork(tf.keras.Model):
             model_name += str(i + 1)
             
             write_model_name(model_name, model_type)
-            tf.saved_model.save(self.model, self.save_model_dir + model_name,
-                signatures=self.model.get_concrete_function(tf.TensorSpec(shape=[None,None],dtype=tf.float32)))
+            tf.saved_model.save(self.model, self.save_model_dir + model_name
+                # , signatures=self.model.get_concrete_function(tf.TensorSpec(shape=[None, None], dtype=tf.float32))
+                )
             
             # Save Results
             results_file = self.save_model_dir + "{}_results.csv".format(model_type)
