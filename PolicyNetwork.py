@@ -68,7 +68,7 @@ class PolicyNetwork(tf.keras.Model):
         train_losses = []
         val_acc = []
         val_losses = []
-        for i, epoch in enumerate(range(epochs)):
+        for i in range(epochs):
             print("\n>>>>>>>>>>>> EPOCH: ", i + 1, " / ", epochs)
             train_accuracy, train_loss = self.run_train_op(train_set)
             val_accuracy, val_loss = self.run_val_op(test_set)
@@ -93,6 +93,11 @@ class PolicyNetwork(tf.keras.Model):
             
             write_model_name(model_name, model_type)
             tf.saved_model.save(self.model, self.save_model_dir + model_name)
+            
+            # Save Results
+            results_file = self.save_model_dir + "{}_results.csv".format(model_type)
+            with open(results_file, "a+") as f:
+                f.write("epoch {}, {}, {}, {}, {}\n".format(i, train_acc, train_losses, val_acc, val_losses))
 
         return (train_acc, train_losses), (val_acc, val_losses)
 

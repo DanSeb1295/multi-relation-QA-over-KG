@@ -98,3 +98,4 @@ def fetch_model_name(model_type='combined'):
     name = config['Models'][model_type]
     if not name: return 'model'
     return name
+
