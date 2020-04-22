@@ -1,6 +1,6 @@
 from Environment import d, State, Environment
 from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
-from util import train_test_split, save_checkpoint
+from util import train_test_split, save_checkpoint, write_model_name
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
@@ -26,9 +26,9 @@ class PolicyNetwork(tf.keras.Model):
         q_vector, H_t = x
         return self.sub_forward(q_vector, H_t)
 
-    def load_saved_model(self, saved_model_path):
+    def load_saved_model(self, saved_model_name):
         try:
-            self.model = tf.saved_model.load(self.save_model_dir + saved_model_name)
+            self.model = keras.models.load_model(self.save_model_dir + saved_model_name)
         except:
             print('Load failed. Initialise new network.')
             
@@ -76,13 +76,20 @@ class PolicyNetwork(tf.keras.Model):
             
             # Save Model
             model_name = 'model'
-            if attention: model_name += '_att'
-            if perceptron: model_name += '_per'
+            model_type = 'combined'
+            if attention: 
+                model_name += '_att'
+                model_type = 'attention'
+            if perceptron: 
+                model_name += '_per'
+                model_type = 'perceptron'
             model_name += str(i + 1)
             
+            write_model_name(model_name, model_type)
             tf.saved_model.save(self.model, self.save_model_dir + model_name)
 
         return (train_acc, train_losses), (val_acc, val_losses)
+
 
 
     def predict(self, inputs, attention=True, perceptron=True):
@@ -114,15 +121,12 @@ class PolicyNetwork(tf.keras.Model):
         print('\n============ TRAINING ============')
         with tf.GradientTape(persistent=True) as tape:
             for inputs in tqdm(train_set):
-                try:
-                    prediction, outputs = self.forward(inputs)
-                    loss = self.REINFORCE_loss_function(outputs)
-                    gradients = tape.gradient(loss, self.model.trainable_variables)
-                    self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
-                    y_hat.append(prediction)
-                    losses.append(loss)
-                except:
-                    continue
+                prediction, outputs = self.forward(inputs)
+                loss = self.REINFORCE_loss_function(outputs)
+                gradients = tape.gradient(loss, self.model.trainable_variables)
+                self.opt.apply_gradients(zip(gradients, self.model.trainable_variables))
+                y_hat.append(prediction)
+                losses.append(loss)
 
         acc = np.mean([y_hat[i] == train_set[i][-1] for i in range(len(y_hat))])
         loss = np.mean(losses)
@@ -137,13 +141,11 @@ class PolicyNetwork(tf.keras.Model):
 
         print('\n============ VALIDATING ============')
         for inputs in tqdm(val_set):
-            try:
-                prediction, outputs = self.forward(inputs)
-                loss = self.REINFORCE_loss_function(outputs)
-                y_hat.append(prediction)
-                losses.append(loss)
-            except:
-                continue
+            prediction, outputs = self.forward(inputs)
+            loss = self.REINFORCE_loss_function(outputs)
+            y_hat.append(prediction)
+            losses.append(loss)
+
 
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
         loss = np.mean(losses)

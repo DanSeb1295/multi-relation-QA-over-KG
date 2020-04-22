@@ -4,6 +4,9 @@ from math import ceil
 import numpy as np
 import tensorflow as tf
 from components import EntityLinker
+import configparser
+
+model_names_path = './saved_models/model_names.ini'
 
 seed = 2020
 train_split = 0.8
@@ -77,6 +80,21 @@ def save_checkpoint(policy_network, save_path, step, write_meta_graph=False):
 
     # TODO: Implement
     '''
+
     saver = tf.train.Saver()
     saver.save(policy_network.sess, save_path, max_to_keep=5, keep_checkpoint_every_n_hours=1,
                  global_step=step, write_meta_graph=write_meta_graph)
+
+def write_model_name(model_name, model_type='combined'):
+    config = configparser.ConfigParser()
+    config.read(model_names_path)
+    config['Models'][model_type] = model_name
+    with open(model_names_path, 'w') as configfile:
+        config.write(configfile)
+
+def fetch_model_name(model_type='combined'):
+    config = configparser.ConfigParser()
+    config.read(model_names_path)
+    name = config['Models'][model_type]
+    if not name: return 'model'
+    return name

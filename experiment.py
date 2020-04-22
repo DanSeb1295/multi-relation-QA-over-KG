@@ -1,6 +1,6 @@
 from PolicyNetwork import PolicyNetwork
 from Environment import Environment
-from util import prep_dataset
+from util import prep_dataset, fetch_model_name
 from matplotlib import pyplot as plt
 import pandas as pd
 
@@ -27,17 +27,21 @@ KG, dataset = prep_dataset(path_KB, path_QA)
 inputs = (KG, dataset, T)
 
 # Initialise Policy Network
-saved_model_name = 'model'
-policy_network = PolicyNetwork(T, saved_model_name)
 
 # Run Experiments
 print('\n\n*********** Policy Network with Perceptron & Attention ***********')
+model_name = fetch_model_name('combined')
+policy_network = PolicyNetwork(T, model_name)
 train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)                # Model uses both attention & perceptro layers
 
 print('\n\n*********** Policy Network with Perceptron Only ***********')
+model_name = fetch_model_name('perceptron')
+policy_network = PolicyNetwork(T, model_name)
 train_per, val_per = policy_network.train(inputs, epochs=epochs, attention=False)         # Model does not use attention layer
 
 print('\n\n*********** Policy Network with Attention Only ***********')
+model_name = fetch_model_name('attention')
+policy_network = PolicyNetwork(T, model_name)
 train_att, val_att = policy_network.train(inputs, epochs=epochs, perceptron=False)        # Model does not use perceptron layer
 
 print(pd.DataFrame({'SRN': [np.mean(val_att_per[0])], 'w/o Attention': [np.mean(val_per[0])],
