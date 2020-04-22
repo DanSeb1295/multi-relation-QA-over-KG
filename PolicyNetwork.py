@@ -132,7 +132,7 @@ class PolicyNetwork(tf.keras.Model):
                 y_hat.append(prediction)
                 if all(x is None for x in outputs):
                     continue
-                loss = -outputs[-1][0]
+                loss = -outputs[-1]
                 # loss = self.REINFORCE_loss_function(outputs)
             gradients = tape.gradient(loss, self.model.trainable_variables)
             self.opt.apply_gradients(
@@ -158,7 +158,7 @@ class PolicyNetwork(tf.keras.Model):
             if all(x is None for x in outputs):
                 continue
             # loss = self.REINFORCE_loss_function(outputs)
-            loss = -outputs[-1][0]
+            loss = -outputs[-1]
             losses.append(loss)
 
         acc = np.mean([y_hat[i] == val_set[i][-1] for i in range(len(y_hat))])
@@ -347,17 +347,21 @@ class PolicyNetwork(tf.keras.Model):
         return [prediction, actions_onehot, action_probs, discount_r]
 
     def discount_rewards(self, rewards, normalize=False):
-        discounted_r = np.zeros_like(rewards).astype(np.float32)
-        running_add = 0
-        for t in reversed(range(0, len(rewards))):
-            if rewards[t] != 0:
-                running_add = 0
-            running_add = running_add * self.ita_discount + rewards[t]
-            discounted_r[t] = running_add
+        # discounted_r = np.zeros_like(rewards).astype(np.float32)
+        # running_add = 0
+        # for t in reversed(range(0, len(rewards))):
+        #     if rewards[t] != 0:
+        #         running_add = 0
+        #     running_add = running_add * self.ita_discount + rewards[t]
+        #     discounted_r[t] = running_add
 
-        if normalize:
-            discounted_r = (discounted_r - np.mean(discounted_r)
-                            ) / (np.std(discounted_r) + 1e-7)
+        # if normalize:
+        #     discounted_r = (discounted_r - np.mean(discounted_r)
+        #                     ) / (np.std(discounted_r) + 1e-7)
+
+        discounted_r = tf.Variable(0)
+        for t in reversed(range(0, len(rewards))):
+            discounted_r = self.ita_discount * discounted_r + rewards[t]
         return discounted_r
 
     def REINFORCE_loss_function(self, outputs):
