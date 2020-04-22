@@ -298,7 +298,7 @@ class PolicyNetwork(tf.keras.Model):
 
             # Softmax Module: Leading to selection of action according to policy
             action_distribution = tf.nn.softmax(semantic_scores)
-            action = self.sample_action(action_space, action_distribution)
+            index, action = self.sample_action(action_space, action_distribution)
 
             a_t[t] = action
             r_t[t] = self.Embedder.embed_relation(action[0])
@@ -312,7 +312,7 @@ class PolicyNetwork(tf.keras.Model):
             # Record action, state and reward
             rewards.append(new_reward)
             action_probs.append(action_distribution)
-            actions_onehot.append(np_utils.to_categorical(np.arange(len(action_space)), num_classes=len(action_space)))
+            actions_onehot.append(np_utils.to_categorical(index, num_classes=len(action_space)))
 
         prediction = S_t[len(S_t)].e_t
         if not rewards:
@@ -322,7 +322,7 @@ class PolicyNetwork(tf.keras.Model):
         for onehot, prob in zip(action_probs, actions_onehot):
           output.append(tf.reduce_sum(prob * onehot, axis=1))
 
-        return prediction, output
+        return prediction, [output, discount_r]
 
 
     def discount_rewards(self, rewards, normalize = False):
@@ -340,6 +340,7 @@ class PolicyNetwork(tf.keras.Model):
 
 
     def REINFORCE_loss_function(self, output):
+        action_prob, rewards = output
         log_action_prob = tf.math.log(tf.cast(output, dtype=tf.float32))     #Log likelihood of probabilities
         loss = - log_action_prob * rewards
         return tf.reduce_mean(loss)
@@ -394,4 +395,4 @@ class PolicyNetwork(tf.keras.Model):
         index = tf.compat.v1.multinomial(rescaled_probas, num_samples=1)
         index = tf.squeeze(index, [0]).numpy()[0]
         
-        return actions[index]
+        return index, actions[index]
