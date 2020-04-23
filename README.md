@@ -38,7 +38,7 @@ To download the dataset, follow the steps below.
 1. Follow this [link](http://139.129.163.161/index/toolkits#pretrained-embeddings)
 2. Download the Freebase dataset. (Submit the license agreement as required)
 3. Unzip the file.
-4. Save the freebase folder into the datasets subfolder i.e. (/datasets/freebase/)
+4. Save the freebase folder into the datasets subfolder i.e. (/datasets/Freebase/)
 
 ### Train the model
  
