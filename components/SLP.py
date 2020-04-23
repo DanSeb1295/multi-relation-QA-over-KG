@@ -1,10 +1,12 @@
 import tensorflow as tf
+from tensorflow.keras import layers
 from Environment import d
 
 initializer = tf.keras.initializers.GlorotNormal()
 
-class SLP():
+class SLP(layers.Layer):
     def __init__(self, T):
+        super(SLP, self).__init__()
         self.weights_dict = {}
         self.biases_dict = {}
 
@@ -12,7 +14,7 @@ class SLP():
             self.weights_dict[t] = tf.Variable(initializer([d, d]), trainable=True)
             self.biases_dict[t] = tf.Variable(initializer([d]), trainable=True)
     
-    def compute(self, q, t):
+    def call(self, q, t):
         w_t = self.weights_dict[t]
         b_t = self.biases_dict[t]
 

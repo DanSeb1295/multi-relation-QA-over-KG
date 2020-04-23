@@ -1,14 +1,16 @@
 import tensorflow as tf
+from tensorflow.keras import layers
 from Environment import d
 
 initializer = tf.keras.initializers.GlorotNormal()
 
-class Attention():
+class Attention(layers.Layer):
     def __init__(self):
+        super(Attention, self).__init__()
         self.W = tf.Variable(initializer([d]), trainable=True)
         self.b = tf.Variable(0, dtype=tf.float32, trainable=True)
 
-    def compute(self, r_star, q_t):
+    def call(self, r_star, q_t):
         if r_star.shape == (d, 1):
             r_star = tf.transpose(r_star)
 

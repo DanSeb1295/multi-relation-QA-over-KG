@@ -1,14 +1,16 @@
 import tensorflow as tf
+from tensorflow.keras import layers
 from Environment import d
 
 initializer = tf.keras.initializers.GlorotNormal()
 
-class Perceptron():
+class Perceptron(layers.Layer):
     def __init__(self):
+        super(Perceptron, self).__init__()
         self.W_L1 = tf.Variable(initializer([d, 2*d]), trainable=True)
         self.W_L2 = tf.Variable(initializer([d]), trainable=True)
 
-    def compute(self, r_star, H_t, q_t_star):
+    def call(self, r_star, H_t, q_t_star):
         if r_star.shape == (d, 1):
             r_star = tf.transpose(r_star)
 
