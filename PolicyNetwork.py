@@ -92,9 +92,6 @@ class PolicyNetwork(tf.keras.Model):
             model_name += str(i + 1)
 
             write_model_name(model_name, model_type)
-            # tf.saved_model.save(self.model, self.save_model_dir + model_name
-            #     # , signatures=self.model.get_concrete_function(tf.TensorSpec(shape=[None, None], dtype=tf.float32))
-            #     )
 
             # Save Results
             results_file = self.save_model_dir + \
@@ -134,7 +131,6 @@ class PolicyNetwork(tf.keras.Model):
                 if all(x is None for x in outputs):
                     continue
                 loss = -outputs[-1]
-                # loss = self.REINFORCE_loss_function(outputs)
             gradients = tape.gradient(loss, self.model.trainable_variables)
             self.opt.apply_gradients(
                 zip(gradients, self.model.trainable_variables))
@@ -158,7 +154,6 @@ class PolicyNetwork(tf.keras.Model):
             y_hat.append(prediction)
             if all(x is None for x in outputs):
                 continue
-            # loss = self.REINFORCE_loss_function(outputs)
             loss = -outputs[-1]
             losses.append(loss)
 
@@ -190,72 +185,6 @@ class PolicyNetwork(tf.keras.Model):
         outputs = [actions_onehot, action_probs, discount_r]
         return prediction, outputs
 
-        # #OUTPUTS
-        # rewards = []
-        # action_probs = []
-        # actions_onehot = []
-
-        # S_t = {}        # T x States; state
-        # q_t = {}        # T x d x n; question
-        # H_t = {}        # T x d; encoded history
-        # r_t = {}        # T x d; relation
-        # a_t = {}        # T x d x 2(relation, next_node)
-        # q_t_star = {}     # T x d; attention weighted question
-
-        # S_t[1] = State(q, e_s, e_s, set())
-        # H_t[0] = np.zeros(d).astype(np.float32)
-        # r_t[0] = np.zeros(d).astype(np.float32)
-        # H_t[1] = self.gru(r_t[0])                 # History Encoder Module
-
-        # for t in range(1, T+1):
-        #     q_t[t] = self.slp(q_vector, t)             # Single-Layer Perceptron Module
-        #     possible_actions = self.env.get_possible_actions()
-
-        #     # Reached terminal node
-        #     if not possible_actions: break
-
-        #     action_space = self.beam_search(possible_actions)
-
-        #     semantic_scores = []
-        #     for action in action_space:
-        #         # Attention Layer: Generate Similarity Scores between q and r and current point of attention
-        #         r_star = self.Embedder.embed_relation(action[0])
-        #         if r_star.all():
-        #             r_star = tf.Variable(r_star)
-        #             q_t_star[t] = self.attention(r_star, q_t[t])
-
-        #             # Perceptron Module: Generate Semantic Score for action given q
-        #             score = self.perceptron(r_star, H_t[t], q_t_star[t])
-        #             semantic_scores.append(score)
-        #         else:
-        #             continue
-
-        #     # Softmax Module: Leading to selection of action according to policy
-        #     action_distribution = tf.nn.softmax(semantic_scores)
-        #     action = self.sample_action(action_space, action_distribution)
-
-        #     a_t[t] = action
-        #     r_t[t] = self.Embedder.embed_relation(action[0])
-        #     H_t[t+1] = self.gru(r_t[t])
-
-        #     # Take action, advance state, and get reward
-        #     # q_t & H_t passed in order to generate the new State object within Environment
-        #     new_state, new_reward = self.env.transit(action, t, q_t, H_t)
-        #     S_t[t+1] = new_state
-
-        #     # Record action, state and reward
-        #     # trajectory += [S_t[t], a_t[t]]
-        #     #TODO: Implement discount factor
-        #     rewards.append(new_reward)
-        #     action_probs.append(action_distribution)
-        #     actions_onehot.append(np_utils.to_categorical(np.arange(len(action_space)), num_classes=len(action_space)))
-
-        # prediction = S_t[len(S_t)].e_t
-        # discount_r = self.discount_rewards(rewards)
-        # action_probs = pad_sequences(action_probs,padding='post')
-        # actions_onehot = pad_sequences(actions_onehot,padding='post')
-
-        # return prediction, [actions_onehot,action_probs,discount_r]
 
     def sub_forward(self, q_vector, H_t_t):
         # OUTPUTS
@@ -348,29 +277,20 @@ class PolicyNetwork(tf.keras.Model):
         return [prediction, actions_onehot, action_probs, discount_r]
 
     def discount_rewards(self, rewards, normalize=False):
-        # discounted_r = np.zeros_like(rewards).astype(np.float32)
-        # running_add = 0
-        # for t in reversed(range(0, len(rewards))):
-        #     if rewards[t] != 0:
-        #         running_add = 0
-        #     running_add = running_add * self.ita_discount + rewards[t]
-        #     discounted_r[t] = running_add
-
-        # if normalize:
-        #     discounted_r = (discounted_r - np.mean(discounted_r)
-        #                     ) / (np.std(discounted_r) + 1e-7)
-
         discounted_r = tf.Variable(0, dtype=tf.float32)
         for t in reversed(range(0, len(rewards))):
             discounted_r = self.ita_discount * discounted_r + rewards[t]
+        
         return discounted_r
 
     def REINFORCE_loss_function(self, outputs):
         actions_onehot, action_probs, rewards = outputs
         action_prob = tf.reduce_sum(action_probs * actions_onehot, axis=1)
+        
         # Log likelihood of probabilities
         log_action_prob = tf.math.log(tf.cast(action_prob, dtype=tf.float32))
         loss = - log_action_prob * rewards
+        
         return tf.reduce_mean(loss)
 
     # TRAINABLE
@@ -397,6 +317,7 @@ class PolicyNetwork(tf.keras.Model):
     def perceptron(self, r_star, H_t, q_t_star):
         # Returns: S(a_t, q) = r_star * W_L2 * ReLU(W_L1 * [H_t; q_t_star])
         return self.Perceptron(r_star, H_t, q_t_star)
+    
     def beam_search(self, possible_actions, beam_size=None):
         if not beam_size:
             beam_size = self.beam_size
