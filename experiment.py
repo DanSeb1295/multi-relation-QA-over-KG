@@ -1,9 +1,6 @@
 from PolicyNetwork import PolicyNetwork
 from Environment import Environment
-from util import prep_dataset, fetch_model_name
-from plot import plot_results
-from matplotlib import pyplot as plt
-import pandas as pd
+from util import prep_dataset, fetch_model_name, plot_results
 import numpy as np
 import tensorflow as tf
 
