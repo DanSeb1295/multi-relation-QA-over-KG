@@ -1,3 +1,4 @@
+import silence_tensorflow.auto
 from Environment import d, State, Environment
 from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
 from util import train_test_split, save_checkpoint, write_model_name
@@ -67,9 +68,8 @@ class PolicyNetwork(tf.keras.Model):
         train_losses = []
         val_acc = []
         val_losses = []
-        print("\n>>>>>>>>>>>> eagerly executing: {}".format(tf.executing_eagerly()))
         for i in range(epochs):
-            print("\n>>>>>>>>>>>> EPOCH: ", i + 1, " / ", epochs)
+            print("\n\n>>>>>>>>>>>> EPOCH: ", i + 1, " / ", epochs)
             train_accuracy, train_loss = self.run_train_op(train_set)
             val_accuracy, val_loss = self.run_val_op(test_set)
 
@@ -119,13 +119,14 @@ class PolicyNetwork(tf.keras.Model):
 
         val_acc, predictions = self.run_val_op(dataset, predictions=True)
         return val_acc, predictions
+    
     def run_train_op(self, train_set, predictions=False):
         # Hyperparameters configuration
         self.model.beam_size = 1
         y_hat = []
         losses = []
 
-        print('\n============ TRAINING ============')
+        print('============ TRAINING ============')
         for inputs in tqdm(train_set):
             with tf.GradientTape(persistent=True) as tape:
                 prediction, outputs = self.forward(inputs)
@@ -375,27 +376,27 @@ class PolicyNetwork(tf.keras.Model):
     # TRAINABLE
     def bigru(self, q):
         # Returns: q_vector
-        return self.BiGRU.compute(q)
+        return self.BiGRU(q)
 
     # TRAINABLE
     def slp(self, q_vector, t):
         # Returns: q_t = Tanh(Wt * q_vector + b_t)
-        return self.SLP.compute(q_vector, t)
+        return self.SLP(q_vector, t)
 
     # TRAINABLE
     def gru(self, r_t):
         # Returns: H_t_plus_1 = GRU(H_t, r_t)
-        return self.GRU.compute(r_t)
+        return self.GRU(r_t)
 
     # TRAINABLE
     def attention(self, r_star, q_t):
         # Returns: q_t_star[t]
-        return self.Attention.compute(r_star, q_t)
+        return self.Attention(r_star, q_t)
 
     # TRAINABLE
     def perceptron(self, r_star, H_t, q_t_star):
         # Returns: S(a_t, q) = r_star * W_L2 * ReLU(W_L1 * [H_t; q_t_star])
-        return self.Perceptron.compute(r_star, H_t, q_t_star)
+        return self.Perceptron(r_star, H_t, q_t_star)
     def beam_search(self, possible_actions, beam_size=None):
         if not beam_size:
             beam_size = self.beam_size

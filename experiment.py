@@ -11,7 +11,7 @@ seed = 1
 np.random.seed(seed)
 tf.random.set_seed(seed)
 
-epochs = 10
+epochs = 8
 
 # paths for the KG and QA files
 path_KB = "./datasets/3H-kb.txt"
@@ -30,16 +30,16 @@ inputs = (KG, dataset, T)
 # Initialise Policy Network
 
 # Run Experiments
-print('\n\n*********** Policy Network with Perceptron & Attention ***********')
-model_name = fetch_model_name('combined')
-policy_network = PolicyNetwork(T, model_name)
-# Model uses both attention & perceptro layers
-train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)
-
-# print('\n\n*********** Policy Network with Perceptron Only ***********')
-# model_name = fetch_model_name('perceptron')
+# print('\n\n*********** Policy Network with Perceptron & Attention ***********')
+# model_name = fetch_model_name('combined')
 # policy_network = PolicyNetwork(T, model_name)
-# train_per, val_per = policy_network.train(inputs, epochs=epochs, attention=False)         # Model does not use attention layer
+# # Model uses both attention & perceptro layers
+# train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)
+
+print('\n\n*********** Policy Network with Perceptron Only ***********')
+model_name = fetch_model_name('perceptron')
+policy_network = PolicyNetwork(T, model_name)
+train_per, val_per = policy_network.train(inputs, epochs=epochs, attention=False)         # Model does not use attention layer
 
 # print('\n\n*********** Policy Network with Attention Only ***********')
 # model_name = fetch_model_name('attention')
@@ -50,19 +50,19 @@ train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)
 #                     'w/o Perceptron': [np.mean(val_att[0])]}, index=["PQ-3H"]).T)
 
 # Plot Results
-xaxis = range(1, epochs + 1)
-ymin = 0
-ymax = 1
-fig = plt.figure()
+# xaxis = range(1, epochs + 1)
+# ymin = 0
+# ymax = 1
+# fig = plt.figure()
 
-plt.title("Ablation Study of PQ-3H")
-plt.xlabel('Epochs')
-plt.ylabel('Validation Set Hits@1')
-plt.plot(xaxis, val_att_per[0], 'r', label='SRN')
-plt.plot(xaxis, val_per[0], 'b', label='no Attention layer')
-plt.plot(xaxis, val_att[0], 'g', label='no Perceptron layer')
-axes = plt.gca()
-axes.set_ylim([ymin, ymax])
+# plt.title("Ablation Study of PQ-3H")
+# plt.xlabel('Epochs')
+# plt.ylabel('Validation Set Hits@1')
+# plt.plot(xaxis, val_att_per[0], 'r', label='SRN')
+# plt.plot(xaxis, val_per[0], 'b', label='no Attention layer')
+# plt.plot(xaxis, val_att[0], 'g', label='no Perceptron layer')
+# axes = plt.gca()
+# axes.set_ylim([ymin, ymax])
 
-plt.legend()
-plt.show()
+# plt.legend()
+# plt.show()
