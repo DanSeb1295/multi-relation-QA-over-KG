@@ -50,19 +50,19 @@ train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)
 #                     'w/o Perceptron': [np.mean(val_att[0])]}, index=["PQ-3H"]).T)
 
 # Plot Results
-xaxis = range(1, epochs + 1)
-ymin = 0
-ymax = 1
-fig = plt.figure()
+# xaxis = range(1, epochs + 1)
+# ymin = 0
+# ymax = 1
+# fig = plt.figure()
 
-plt.title("Ablation Study of PQ-3H")
-plt.xlabel('Epochs')
-plt.ylabel('Validation Set Hits@1')
-plt.plot(xaxis, val_att_per[0], 'r', label='SRN')
-plt.plot(xaxis, val_per[0], 'b', label='no Attention layer')
-plt.plot(xaxis, val_att[0], 'g', label='no Perceptron layer')
-axes = plt.gca()
-axes.set_ylim([ymin, ymax])
+# plt.title("Ablation Study of PQ-3H")
+# plt.xlabel('Epochs')
+# plt.ylabel('Validation Set Hits@1')
+# plt.plot(xaxis, val_att_per[0], 'r', label='SRN')
+# plt.plot(xaxis, val_per[0], 'b', label='no Attention layer')
+# plt.plot(xaxis, val_att[0], 'g', label='no Perceptron layer')
+# axes = plt.gca()
+# axes.set_ylim([ymin, ymax])
 
-plt.legend()
-plt.show()
+# plt.legend()
+# plt.show()
