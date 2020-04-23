@@ -30,16 +30,16 @@ inputs = (KG, dataset, T)
 # Initialise Policy Network
 
 # Run Experiments
-print('\n\n*********** Policy Network with Perceptron & Attention ***********')
-model_name = fetch_model_name('combined')
-policy_network = PolicyNetwork(T, model_name)
-# Model uses both attention & perceptro layers
-train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)
-
-# print('\n\n*********** Policy Network with Perceptron Only ***********')
-# model_name = fetch_model_name('perceptron')
+# print('\n\n*********** Policy Network with Perceptron & Attention ***********')
+# model_name = fetch_model_name('combined')
 # policy_network = PolicyNetwork(T, model_name)
-# train_per, val_per = policy_network.train(inputs, epochs=epochs, attention=False)         # Model does not use attention layer
+# # Model uses both attention & perceptro layers
+# train_att_per, val_att_per = policy_network.train(inputs, epochs=epochs)
+
+print('\n\n*********** Policy Network with Perceptron Only ***********')
+model_name = fetch_model_name('perceptron')
+policy_network = PolicyNetwork(T, model_name)
+train_per, val_per = policy_network.train(inputs, epochs=epochs, attention=False)         # Model does not use attention layer
 
 # print('\n\n*********** Policy Network with Attention Only ***********')
 # model_name = fetch_model_name('attention')
