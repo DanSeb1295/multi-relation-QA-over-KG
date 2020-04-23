@@ -1,3 +1,4 @@
+import silence_tensorflow.auto
 from Environment import d, State, Environment
 from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
 from util import train_test_split, save_checkpoint, write_model_name
