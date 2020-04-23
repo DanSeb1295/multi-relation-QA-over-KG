@@ -119,6 +119,7 @@ class PolicyNetwork(tf.keras.Model):
 
         val_acc, predictions = self.run_val_op(dataset, predictions=True)
         return val_acc, predictions
+    
     def run_train_op(self, train_set, predictions=False):
         # Hyperparameters configuration
         self.model.beam_size = 1
