@@ -9,6 +9,9 @@ relation2vec.bin
 results/*
 !results/.gitkeep
 
+# VSCode
+.vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
