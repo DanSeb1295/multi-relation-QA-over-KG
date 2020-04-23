@@ -69,7 +69,7 @@ class PolicyNetwork(tf.keras.Model):
         val_acc = []
         val_losses = []
         for i in range(epochs):
-            print("\n>>>>>>>>>>>> EPOCH: ", i + 1, " / ", epochs)
+            print("\n\n>>>>>>>>>>>> EPOCH: ", i + 1, " / ", epochs)
             train_accuracy, train_loss = self.run_train_op(train_set)
             val_accuracy, val_loss = self.run_val_op(test_set)
 
@@ -126,7 +126,7 @@ class PolicyNetwork(tf.keras.Model):
         y_hat = []
         losses = []
 
-        print('\n============ TRAINING ============')
+        print('============ TRAINING ============')
         for inputs in tqdm(train_set):
             with tf.GradientTape(persistent=True) as tape:
                 prediction, outputs = self.forward(inputs)
