@@ -67,7 +67,6 @@ class PolicyNetwork(tf.keras.Model):
         train_losses = []
         val_acc = []
         val_losses = []
-        print("\n>>>>>>>>>>>> eagerly executing: {}".format(tf.executing_eagerly()))
         for i in range(epochs):
             print("\n>>>>>>>>>>>> EPOCH: ", i + 1, " / ", epochs)
             train_accuracy, train_loss = self.run_train_op(train_set)
