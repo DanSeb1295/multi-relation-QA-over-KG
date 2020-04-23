@@ -1,6 +1,6 @@
 from PolicyNetwork import PolicyNetwork
 from Environment import Environment
-from util import prep_dataset, fetch_model_name, plot_results
+from util import prep_dataset, fetch_model_name
 import numpy as np
 import tensorflow as tf
 
@@ -34,6 +34,3 @@ print('\n\n*********** Policy Network with Perceptron Only ***********')
 model_name = fetch_model_name('perceptron')
 policy_network = PolicyNetwork(T, model_name)
 train_per, val_per = policy_network.train(inputs, epochs=epochs, attention=False)		# Model does not use attention layer
-
-# Plot Results
-plot_results()

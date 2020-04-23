@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 results_path = './saved_models/'
 
 def plot_results(file_path=results_path):
-    epochs, results_dic = getAllResults(file_path, model_types=['combined','attention'])
+    epochs, results_dic = getAllResults(file_path, model_types=['combined','perceptron'])
     xaxis = range(1, epochs + 2)
     ymin = 0
     ymax = 1
@@ -15,14 +15,14 @@ def plot_results(file_path=results_path):
     plt.gca().set_title('Training')
     plt.ylabel('Loss')
     plt.plot(xaxis, results_dic['combined']['train_loss'], 'ro-', label='SRN')
-    # plt.plot(xaxis, results_dic['attention']['train_loss'], 'go-', label='no Perceptron layer')
+    plt.plot(xaxis, results_dic['perceptron']['train_loss'], 'go-', label='no Perceptron layer', color='DarkBlue')
 
     ax = plt.subplot(2, 1, 2)
     plt.gca().set_ylim([ymin, ymax])
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.plot(xaxis, results_dic['combined']['train_acc'], 'ro-', label='SRN')
-    # plt.plot(xaxis, results_dic['attention']['train_acc'], 'go-', label='no Perceptron layer')
+    plt.plot(xaxis, results_dic['perceptron']['train_acc'], 'go-', label='no Perceptron layer', color='DarkBlue')
 
     handles, labels = ax.get_legend_handles_labels()
     fig1.legend(handles, labels, loc='upper right')
@@ -35,14 +35,14 @@ def plot_results(file_path=results_path):
     plt.gca().set_title('Validation')
     plt.ylabel('Loss')
     plt.plot(xaxis, results_dic['combined']['val_loss'], 'ro-', label='SRN')
-    # plt.plot(xaxis, results_dic['attention']['val_loss'], 'go-', label='no Perceptron layer')
+    plt.plot(xaxis, results_dic['perceptron']['val_loss'], 'go-', label='no Perceptron layer', color='DarkBlue')
 
     ax = plt.subplot(2, 1, 2)
     plt.gca().set_ylim([ymin, ymax])
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.plot(xaxis, results_dic['combined']['val_acc'], 'ro-', label='SRN')
-    # plt.plot(xaxis, results_dic['attention']['val_acc'], 'go-', label='no Perceptron layer')
+    plt.plot(xaxis, results_dic['perceptron']['val_acc'], 'go-', label='no Perceptron layer', color='DarkBlue')
 
 
     handles, labels = ax.get_legend_handles_labels()
