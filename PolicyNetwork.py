@@ -1,12 +1,12 @@
 import silence_tensorflow.auto
+import numpy as np
+import tensorflow as tf
 from Environment import d, State, Environment
 from components import BiGRU, GRU, Perceptron, SLP, Embedder, Attention
 from util import train_test_split, save_checkpoint, write_model_name
-import numpy as np
-import tensorflow as tf
 from tensorflow import keras
-from keras.preprocessing.sequence import pad_sequences
-from keras import utils as np_utils
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras import utils as np_utils
 from tqdm import tqdm
 
 
