@@ -12,14 +12,13 @@ Use [pip](https://pip.pypa.io/en/stable/) as a package manager to install the re
 ```bash
 pip install matplotlib
 ```
----
 
 **If you wish to train the model:**
 
 ```bash
 pip install -r requirements.txt
 ```
-----
+
 ## Visualizing the model results
 
 ```bash
@@ -28,7 +27,6 @@ python plot.py
 
 Training and Validation results are displayed in separate plots.
 
-----
 ## Training the model
 
 ### Download the dataset
