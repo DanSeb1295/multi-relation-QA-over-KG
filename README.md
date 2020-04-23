@@ -1,27 +1,28 @@
 # Multi-Relation-QA-over-KG
-Run all commands from the directory containing this README file. Make sure python 3.5 or above is installed.
+This is an implementation of the stepwise-reasoning network described in this [paper](https://dl.acm.org/doi/abs/10.1145/3336191.3371812).
 
+
+Run all commands from the directory containing this README file. Code is ran with python 3.5 or above.
 
 ## Installing Libraries
 Use [pip](https://pip.pypa.io/en/stable/) as a package manager to install the required libraries.
 
 **If you only wish to see the model results:**
-
-Execute ``` 
+ 
+```bash
 pip install matplotlib
 ```
 ---
 
 **If you wish to train the model:**
 
-
-Execute ```
+```bash
 pip install -r requirements.txt
 ```
 ----
 ## Visualizing the model results
 
-Execute ```
+```bash
 python plot.py
 ```
 
@@ -42,7 +43,10 @@ To download the dataset, follow the steps below.
 4. Save the freebase folder into the datasets subfolder i.e. (/datasets/freebase/)
 
 ### Train the model
-
-Execute ``` 
+ 
+```bash 
 python experiment.py
 ```
+A stepwise reasoning network and an ablated version of the network without the perceptron layer is trained using the PathQuestion dataset.
+
+Results will be stored in the subfolder /saved_models/ in csv format.
