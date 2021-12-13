@@ -23,7 +23,7 @@ itsdangerous==0.24
 Jinja2==2.10
 kaggle==1.0.5
 kaggle-cli==0.12.13
-lxml==4.0.0
+lxml==4.6.5
 MarkupSafe==1.0
 matplotlib==2.1.1
 MechanicalSoup==0.8.0
