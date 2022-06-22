@@ -30,7 +30,7 @@ MechanicalSoup==0.8.0
 more-itertools==4.0.1
 names==0.3.0
 ndg-httpsclient==0.4.3
-numpy==1.15.1
+numpy==1.22.0
 opencv-contrib-python==3.4.0.12
 pandas==0.22.0
 pbr==3.1.1
